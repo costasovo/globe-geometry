@@ -50,8 +50,8 @@ class globeGeometry.LatLng
     @export
   ###
   toUrlValue: (precision = 6) ->
-    lat = @lat.toFixed precision
-    lng = @lng.toFixed precision
+    lat = @round @getLat(), precision
+    lng = @round @getLng(), precision
     return Number(lat) + ',' + Number(lng)
 
   ###*
@@ -59,7 +59,7 @@ class globeGeometry.LatLng
     @return {boolean}
     @export
   ###
-  equal: (other) ->
+  equals: (other) ->
     lat = @round @getLat()
     lat2 = @round other.getLat()
     lng = @round @getLng()
@@ -68,11 +68,13 @@ class globeGeometry.LatLng
 
   ###*
     @param {number} num
+    @param {number=} precision
     @return {number}
     @private
   ###
-  round: (num) ->
+  round: (num, precision) ->
+    precision = @PRECISION if !goog.isDefAndNotNull precision
     for i in [0..6]
       if num <= 10^i
-        return Number num.toPrecision @PRECISION + i
-    return Number num.toPrecision @PRECISION
+        return Number num.toPrecision precision + i + 1
+    return Number num.toPrecision precision
