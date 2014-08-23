@@ -1,0 +1,39 @@
+{
+  "name": "globe-geometry",
+  "version": "0.0.1",
+  "description": "Spatial geometry library",
+  "author": "Michal Sänger <michal.sanger@gmail.com>",
+  "private": true,
+  "keywords": [
+    "Spatial",
+    "Geometry",
+    "Latitude",
+    "Longitude",
+    "latLng",
+    "CoffeeScript",
+    "Google",
+    "Closure",
+    "Este",
+    "Gulp"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/michalsanger/globe-geometry.git"
+  },
+  "dependencies": {
+    "gulp": "^3.6.1",
+    "coffee-script": "^1.7.1"
+  },
+  "devDependencies": {
+    "gulp-este": "^1.0.2",
+    "run-sequence": "^0.3.6",
+    "yargs": "^1.2.1"
+  },
+  "scripts": {
+    "test": "gulp test"
+  },
+  "engines": {
+    "node": "v0.10.x"
+  },
+  "license": "MIT"
+}
