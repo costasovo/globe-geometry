@@ -24,6 +24,12 @@ class globeGeometry.LatLng
   constructor: (lat, lng) ->
     @lat = Number lat
     @lng = Number lng
+    if isFinite @lat
+      @lat = Math.max -90, @lat
+      @lat = Math.min @lat, 90
+    if isFinite @lng
+      @lng = Math.max -180, @lng
+      @lng = Math.min @lng, 180
 
   ###*
     @return {number}

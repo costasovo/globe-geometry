@@ -13,6 +13,15 @@ suite 'globeGeometry.LatLng', ->
       assert.deepEqual latLng.getLat(), NaN
       assert.deepEqual latLng.getLng(), 17.46897
 
+    test 'should limit input into range', ->
+      latLng = new LatLng 300, 500
+      assert.deepEqual latLng.getLat(), 90
+      assert.deepEqual latLng.getLng(), 180
+
+      latLng = new LatLng -300, -500
+      assert.deepEqual latLng.getLat(), -90
+      assert.deepEqual latLng.getLng(), -180
+
   suite 'toString', ->
     test 'should work with floats', ->
       assert.equal new LatLng(42.3, 17.46897).toString(), '(42.3, 17.46897)'
@@ -21,6 +30,10 @@ suite 'globeGeometry.LatLng', ->
       assert.equal new LatLng(42, -17).toString(), '(42, -17)'
 
   suite 'toUrlValue', ->
+    test 'should work with precision', ->
+      latLng = new LatLng(1.123456789, -2.123456789)
+      assert.deepEqual latLng.toUrlValue(2), '1.12,-2.12'
+
     test 'should work with default precision 6', ->
       latLng = new LatLng(1.123456789, -2.123456789)
       assert.deepEqual latLng.toUrlValue(), '1.123457,-2.123457'
