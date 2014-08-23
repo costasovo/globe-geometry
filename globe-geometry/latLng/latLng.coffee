@@ -4,7 +4,7 @@
 
 goog.provide 'globeGeometry.LatLng'
 
-goog.require 'goog.string'
+goog.require 'goog.math'
 
 class globeGeometry.LatLng
 
@@ -22,14 +22,8 @@ class globeGeometry.LatLng
     @export
   ###
   constructor: (lat, lng) ->
-    @lat = Number lat
-    @lng = Number lng
-    if isFinite @lat
-      @lat = Math.max -90, @lat
-      @lat = Math.min @lat, 90
-    if isFinite @lng
-      @lng = Math.max -180, @lng
-      @lng = Math.min @lng, 180
+    @lat = goog.math.clamp Number(lat), -90, 90
+    @lng = goog.math.clamp Number(lng), -180, 180
 
   ###*
     @return {number}
@@ -66,11 +60,7 @@ class globeGeometry.LatLng
     @export
   ###
   equals: (other) ->
-    lat = @round @getLat()
-    lat2 = @round other.getLat()
-    lng = @round @getLng()
-    lng2 = @round other.getLng()
-    return (lat == lat2) && (@lng == lng2)
+    return goog.math.nearlyEquals(@getLat(), other.getLat()) && goog.math.nearlyEquals(@getLng(), other.getLng())
 
   ###*
     @param {number} num
@@ -78,9 +68,6 @@ class globeGeometry.LatLng
     @return {number}
     @private
   ###
-  round: (num, precision) ->
-    precision = @PRECISION if !goog.isDefAndNotNull precision
-    for i in [0..6]
-      if num <= 10^i
-        return Number num.toPrecision precision + i + 1
-    return Number num.toPrecision precision
+  round: (num, precision = @PRECISION) ->
+    big = Math.abs(num) * 10**precision
+    return goog.math.sign(num) * goog.math.safeFloor(big) / 10**precision
