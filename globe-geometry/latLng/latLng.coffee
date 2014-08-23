@@ -9,6 +9,12 @@ goog.require 'goog.string'
 class globeGeometry.LatLng
 
   ###*
+    @type {number}
+    @private
+  ###
+  PRECISION: 9
+
+  ###*
     @param {*} lat
     @param {*} lng
     @constructor
@@ -46,4 +52,27 @@ class globeGeometry.LatLng
   toUrlValue: (precision = 6) ->
     lat = @lat.toFixed precision
     lng = @lng.toFixed precision
-    return Number(lat).toString() + ',' + Number(lng).toString()
+    return Number(lat) + ',' + Number(lng)
+
+  ###*
+    @param {globeGeometry.LatLng} other
+    @return {boolean}
+    @export
+  ###
+  equal: (other) ->
+    lat = @round @getLat()
+    lat2 = @round other.getLat()
+    lng = @round @getLng()
+    lng2 = @round other.getLng()
+    return (lat == lat2) && (@lng == lng2)
+
+  ###*
+    @param {number} num
+    @return {number}
+    @private
+  ###
+  round: (num) ->
+    for i in [0..6]
+      if num <= 10^i
+        return Number num.toPrecision @PRECISION + i
+    return Number num.toPrecision @PRECISION

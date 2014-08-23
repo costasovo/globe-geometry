@@ -30,3 +30,36 @@ suite 'globeGeometry.LatLng', ->
       assert.deepEqual latLng.toUrlValue(10), '1.12,-2.12'
       latLng = new LatLng(10, -20)
       assert.deepEqual latLng.toUrlValue(10), '10,-20'
+
+  suite 'equal', ->
+    test 'should work with non equal latLng', ->
+      dataProvider = [
+        [10, -20]
+        [-20, 10]
+        [1.123, -2]
+      ]
+      latLng = new LatLng(1.123, -20)
+      for data in dataProvider
+        latLng2 = new LatLng data[0], data[1]
+        assert.isFalse latLng.equal(latLng2), latLng2.toString()
+
+    test 'should work with equal latLng', ->
+      dataProvider = [
+        [10, -20]
+        [-20, 10]
+        [1.123, -2]
+      ]
+      for data in dataProvider
+        latLng = new LatLng data[0], data[1]
+        latLng2 = new LatLng data[0], data[1]
+        assert.isTrue latLng.equal(latLng2), latLng2.toString()
+
+    test 'should work with decimal precision', ->
+      dataProvider = [
+        [10, 1.4, 10, 1.40000000000001]
+        [10, 3.4, 10, 3.39999999999999]
+      ]
+      for data in dataProvider
+        latLng = new LatLng data[0], data[1]
+        latLng2 = new LatLng data[2], data[3]
+        assert.isTrue latLng.equal(latLng2), latLng.toString() + ' === ' + latLng2.toString()
