@@ -13,3 +13,12 @@ suite 'globeGeometry.spherical', ->
       distance = Spherical.computeDistanceBetween brno, nyc
 
       assert.equal Math.round(distance), 6760615
+
+  suite 'computeHeading', ->
+    test 'should work for Brno and Barcelona', ->
+      brno = new LatLng '49.2020701', '16.5779606'
+      barcelona = new LatLng '41.39479', '2.1487679'
+
+      angle = Spherical.computeHeading brno, barcelona
+
+      assert.equal Math.round(angle), -122
