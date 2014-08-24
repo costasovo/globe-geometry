@@ -1,4 +1,5 @@
-# globe-geometry
+# globe-geometry [![devDependency Status](https://david-dm.org/michalsanger/globe-geometry/dev-status.png)](https://david-dm.org/michalsanger/globe-geometry#info=devDependencies)
+
 
 Spatial geometry library optimized for Google Closure.
 
