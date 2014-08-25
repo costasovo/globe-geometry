@@ -22,3 +22,18 @@ suite 'globeGeometry.spherical', ->
       angle = Spherical.computeHeading brno, barcelona
 
       assert.equal Math.round(angle), -122
+
+  suite 'computeLength', ->
+    test 'should work for circle', ->
+      brno = new LatLng '49.2020701', '16.5779606'
+      barcelona = new LatLng '41.39479', '2.1487679'
+      nyc = new LatLng '40.7056308', '-73.9780035'
+      brnoBarcelona = Spherical.computeDistanceBetween brno, barcelona
+      barcelonaNyc = Spherical.computeDistanceBetween barcelona, nyc
+      nycBrno = Spherical.computeDistanceBetween nyc, brno
+      path = [brno, barcelona, nyc, brno]
+      testLength = brnoBarcelona + barcelonaNyc + nycBrno
+
+      length = Spherical.computeLength path
+
+      assert.equal Math.round(length), Math.round(testLength)

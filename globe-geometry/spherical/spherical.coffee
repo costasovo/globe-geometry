@@ -55,3 +55,19 @@ class globeGeometry.spherical
             Math.sin(fromLat)*Math.cos(toLat)*Math.cos(deltaLng)
     heading = Math.atan2 y, x
     return goog.math.toDegrees heading
+
+  ###*
+    @param {Array.<globeGeometry.LatLng>} path
+    @param {number=} radius
+    @return {number}
+    @export
+    @see http://www.movable-type.co.uk/scripts/latlong.html
+  ###
+  @computeLength: (path, radius = globeGeometry.spherical.RADIUS) ->
+    length = 0
+    for point, i in path
+      from = path[i]
+      to = path[i + 1]
+      if to instanceof globeGeometry.LatLng
+        length += globeGeometry.spherical.computeDistanceBetween from, to, radius
+    return length
