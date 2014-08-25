@@ -30,7 +30,7 @@
     "yargs": "^1.2.1"
   },
   "scripts": {
-    "test": "gulp test"
+    "test": "gulp compile"
   },
   "engines": {
     "node": "v0.10.x"
