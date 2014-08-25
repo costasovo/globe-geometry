@@ -1,4 +1,4 @@
-# globe-geometry [![devDependency Status](https://david-dm.org/michalsanger/globe-geometry/dev-status.png)](https://david-dm.org/michalsanger/globe-geometry#info=devDependencies)
+# globe-geometry [![devDependency Status](https://david-dm.org/michalsanger/globe-geometry/dev-status.png)](https://david-dm.org/michalsanger/globe-geometry#info=devDependencies) [![Build Status](https://travis-ci.org/michalsanger/globe-geometry.svg?branch=master)](https://travis-ci.org/michalsanger/globe-geometry)
 
 
 Spatial geometry library optimized for Google Closure.
