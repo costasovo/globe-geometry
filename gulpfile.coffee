@@ -50,15 +50,29 @@ gulp.task 'js', (done) ->
 gulp.task 'build', (done) ->
   runSequence 'transpile', 'js', done
 
-gulp.task 'compile', ['build'], ->
+gulp.task 'compile', (done) ->
+  runSequence 'build', 'run-compile-concat', 'run-compile-min', done
+
+gulp.task 'run-compile-concat', ->
   namespaces = este.getProvidedNamespaces './tmp/deps.js', /\['(globeGeometry\.[^']+)/g
-  este.compile paths.scripts, 'tmp',
+  este.compile paths.scripts, 'build',
     fileName: 'globeGeometry.js'
     compilerPath: paths.compiler
     compilerFlags:
-      # NOTE(steida): closure_entry_point ensures that whole este-library is
-      # checked by compiler.
-      closure_entry_point: namespaces
+      closure_entry_point: namespaces # ensures that whole este-library is checked by compiler
+      externs: paths.externs
+      generate_exports: true
+      compilation_level: 'WHITESPACE_ONLY'
+      debug: true
+      formatting: 'PRETTY_PRINT'
+
+gulp.task 'run-compile-min', ->
+  namespaces = este.getProvidedNamespaces './tmp/deps.js', /\['(globeGeometry\.[^']+)/g
+  este.compile paths.scripts, 'build',
+    fileName: 'globeGeometry.min.js'
+    compilerPath: paths.compiler
+    compilerFlags:
+      closure_entry_point: namespaces # ensures that whole este-library is checked by compiler
       externs: paths.externs
       generate_exports: true
 
