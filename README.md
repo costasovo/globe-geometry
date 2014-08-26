@@ -9,13 +9,13 @@ Written in CoffeeScript and powered by http://github.com/steida/este-library
   Get compiled JS in `dist` dir.
 
   ```javascript
-  brno = new globeGeometry.LatLng('49.2020701', '16.5779606');
-  nyc = new globeGeometry.LatLng('40.7056308', '-73.9780035');
-  barcelona = new globeGeometry.LatLng('41.39479', '2.1487679');
+  var brno = new globeGeometry.LatLng('49.2020701', '16.5779606');
+  var nyc = new globeGeometry.LatLng(40.7056308, -73.9780035);
+  var barcelona = new globeGeometry.LatLng('41.39479', '2.1487679');
 
-  distance = globeGeometry.spherical.computeDistanceBetween(brno, nyc);
-  heading = globeGeometry.computeHeading(barcelona, nyc);
-  length = globeGeometry.computeLength([brno, barcelona, nyc]);
+  var distance = globeGeometry.spherical.computeDistanceBetween(brno, nyc);
+  var heading = globeGeometry.computeHeading(barcelona, nyc);
+  var length = globeGeometry.computeLength([brno, barcelona, nyc]);
   ```
 
 ## Dev
