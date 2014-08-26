@@ -4,6 +4,7 @@ GulpEste = require 'gulp-este'
 runSequence = require 'run-sequence'
 
 yargs = require 'yargs'
+_ = require 'lodash'
 
 este = new GulpEste __dirname, true, '../../../..'
 
@@ -54,27 +55,28 @@ gulp.task 'compile', (done) ->
   runSequence 'build', 'run-compile-concat', 'run-compile-min', done
 
 gulp.task 'run-compile-concat', ->
-  namespaces = este.getProvidedNamespaces './tmp/deps.js', /\['(globeGeometry\.[^']+)/g
-  este.compile paths.scripts, 'build',
-    fileName: 'globeGeometry.js'
-    compilerPath: paths.compiler
-    compilerFlags:
-      closure_entry_point: namespaces # ensures that whole este-library is checked by compiler
-      externs: paths.externs
-      generate_exports: true
-      compilation_level: 'WHITESPACE_ONLY'
-      debug: true
-      formatting: 'PRETTY_PRINT'
+  runCompile
+    compilation_level: 'WHITESPACE_ONLY'
+    debug: true
+    formatting: 'PRETTY_PRINT'
 
 gulp.task 'run-compile-min', ->
+  runCompile()
+
+runCompile = (params) ->
   namespaces = este.getProvidedNamespaces './tmp/deps.js', /\['(globeGeometry\.[^']+)/g
+  defaults =
+    closure_entry_point: namespaces # ensures that whole este-library is checked by compiler
+    externs: paths.externs
+    generate_exports: true
+
+  flags = _.merge defaults, params
+
   este.compile paths.scripts, 'build',
     fileName: 'globeGeometry.min.js'
     compilerPath: paths.compiler
     compilerFlags:
-      closure_entry_point: namespaces # ensures that whole este-library is checked by compiler
-      externs: paths.externs
-      generate_exports: true
+      flags
 
 gulp.task 'watch', ->
   este.watch dirs.watch,
@@ -88,5 +90,5 @@ gulp.task 'run', (done) ->
 gulp.task 'default', (done) ->
   runSequence 'build', 'run', done
 
-gulp.task 'bump', (done) ->
+gulp.task 'bump', ['compile'], (done) ->
   este.bump './*.json', yargs, done
