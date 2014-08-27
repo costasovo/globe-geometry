@@ -69,5 +69,5 @@ class globeGeometry.LatLng
     @private
   ###
   round: (num, precision = @PRECISION) ->
-    big = Math.abs(num) * 10**precision
-    return goog.math.sign(num) * goog.math.safeFloor(big) / 10**precision
+    big = Math.abs(num) * Math.pow(10, precision)
+    return goog.math.sign(num) * goog.math.safeFloor(big) / Math.pow(10, precision)
