@@ -72,7 +72,7 @@ runCompile = (params) ->
 
   flags = _.merge defaults, params
 
-  este.compile paths.scripts, 'build',
+  este.compile paths.scripts, 'dist',
     fileName: 'globeGeometry.min.js'
     compilerPath: paths.compiler
     compilerFlags:
