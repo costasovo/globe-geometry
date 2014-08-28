@@ -14,8 +14,10 @@ Written in CoffeeScript and powered by http://github.com/steida/este-library
   var barcelona = new globeGeometry.LatLng('41.39479', '2.1487679');
 
   var distance = globeGeometry.spherical.computeDistanceBetween(brno, nyc);
-  var heading = globeGeometry.computeHeading(barcelona, nyc);
-  var length = globeGeometry.computeLength([brno, barcelona, nyc]);
+  var heading = globeGeometry.spherical.computeHeading(barcelona, nyc);
+  var length = globeGeometry.spherical.computeLength([brno, barcelona, nyc]);
+
+  var london = globeGeometry.spherical.computeOffset brno, 1209636, -71.4224
   ```
 
 ## Dev

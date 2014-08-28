@@ -48,3 +48,11 @@ suite 'globeGeometry.spherical', ->
       offset = Spherical.computeOffset brno, distance, heading
 
       assert.isTrue offset.equals shouldBe
+
+    test 'should work with computeHeading and computeDistanceBetween', ->
+      brno = new LatLng 49.2020701, 16.5779606
+      barcelona = new LatLng 41.39479, 2.1487679
+      distance = Spherical.computeDistanceBetween brno, barcelona
+      heading = Spherical.computeHeading brno, barcelona
+
+      assert.isTrue barcelona.equals Spherical.computeOffset brno, distance, heading

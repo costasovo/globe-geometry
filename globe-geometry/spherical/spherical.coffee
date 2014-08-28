@@ -82,7 +82,6 @@ class globeGeometry.spherical
     @see http://www.movable-type.co.uk/scripts/latlong.html
   ###
   @computeOffset: (from, distance, heading, radius = globeGeometry.spherical.RADIUS) ->
-    #return from
     headingRad = goog.math.toRadians heading
     distanceRad = distance / radius
 
@@ -90,9 +89,9 @@ class globeGeometry.spherical
     lngRad = goog.math.toRadians from.getLng()
 
     toLatRad = Math.asin( Math.sin(latRad)*Math.cos(distanceRad) +
-                        Math.cos(latRad)*Math.sin(distanceRad)*Math.cos(headingRad) );
+                        Math.cos(latRad)*Math.sin(distanceRad)*Math.cos(headingRad) )
     toLngRad = lngRad + Math.atan2(Math.sin(headingRad)*Math.sin(distanceRad)*Math.cos(latRad),
                              Math.cos(distanceRad)-Math.sin(latRad)*Math.sin(toLatRad))
-    toLngRad = (toLngRad+3*Math.PI) % (2*Math.PI) - Math.PI;
+    toLngRad = (toLngRad+3*Math.PI) % (2*Math.PI) - Math.PI
 
     return new globeGeometry.LatLng(goog.math.toDegrees(toLatRad), goog.math.toDegrees(toLngRad))
