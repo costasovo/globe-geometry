@@ -95,3 +95,18 @@ class globeGeometry.spherical
     toLngRad = (toLngRad+3*Math.PI) % (2*Math.PI) - Math.PI
 
     return new globeGeometry.LatLng(goog.math.toDegrees(toLatRad), goog.math.toDegrees(toLngRad))
+
+  ###*
+    @param {globeGeometry.LatLng} to
+    @param {number} distance
+    @param {number} heading
+    @param {number=} radius
+    @return {globeGeometry.LatLng}
+    @export
+    @see http://www.movable-type.co.uk/scripts/latlong.html
+  ###
+  @computeOffsetOrigin: (to, distance, heading, radius = globeGeometry.spherical.RADIUS) ->
+    heading = (heading + 180) % 360
+    return globeGeometry.spherical.computeOffset to, distance, heading
+
+

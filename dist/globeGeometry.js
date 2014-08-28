@@ -1969,4 +1969,11 @@ globeGeometry.spherical.computeOffset = function(from, distance, heading, radius
   toLngRad = (toLngRad + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
   return new globeGeometry.LatLng(goog.math.toDegrees(toLatRad), goog.math.toDegrees(toLngRad));
 };
+globeGeometry.spherical.computeOffsetOrigin = function(to, distance, heading, radius) {
+  if (radius == null) {
+    radius = globeGeometry.spherical.RADIUS;
+  }
+  heading = (heading + 180) % 360;
+  return globeGeometry.spherical.computeOffset(to, distance, heading);
+};
 })();
