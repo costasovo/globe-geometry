@@ -55,15 +55,15 @@ gulp.task 'compile', (done) ->
   runSequence 'build', 'run-compile-concat', 'run-compile-min', done
 
 gulp.task 'run-compile-concat', ->
-  runCompile
+  runCompile 'globeGeometry.js',
     compilation_level: 'WHITESPACE_ONLY'
     debug: true
     formatting: 'PRETTY_PRINT'
 
 gulp.task 'run-compile-min', ->
-  runCompile()
+  runCompile 'globeGeometry.min.js'
 
-runCompile = (params) ->
+runCompile = (fileName, params) ->
   namespaces = este.getProvidedNamespaces './tmp/deps.js', /\['(globeGeometry\.[^']+)/g
   defaults =
     closure_entry_point: namespaces # ensures that whole este-library is checked by compiler
@@ -73,7 +73,7 @@ runCompile = (params) ->
   flags = _.merge defaults, params
 
   este.compile paths.scripts, 'dist',
-    fileName: 'globeGeometry.min.js'
+    fileName: fileName
     compilerPath: paths.compiler
     compilerFlags:
       flags
