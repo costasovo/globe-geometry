@@ -37,3 +37,14 @@ suite 'globeGeometry.spherical', ->
       length = Spherical.computeLength path
 
       assert.equal Math.round(length), Math.round(testLength)
+
+  suite 'computeOffset', ->
+    test 'should work', ->
+      brno = new LatLng '49.2020701', '16.5779606'
+      distance = 12345
+      heading = 225
+      shouldBe = new LatLng 49.123592015556916, 16.45813708831463
+
+      offset = Spherical.computeOffset brno, distance, heading
+
+      assert.isTrue offset.equals shouldBe

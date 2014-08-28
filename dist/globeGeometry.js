@@ -1955,4 +1955,18 @@ globeGeometry.spherical.computeLength = function(path, radius) {
   }
   return length;
 };
+globeGeometry.spherical.computeOffset = function(from, distance, heading, radius) {
+  var distanceRad, headingRad, latRad, lngRad, toLatRad, toLngRad;
+  if (radius == null) {
+    radius = globeGeometry.spherical.RADIUS;
+  }
+  headingRad = goog.math.toRadians(heading);
+  distanceRad = distance / radius;
+  latRad = goog.math.toRadians(from.getLat());
+  lngRad = goog.math.toRadians(from.getLng());
+  toLatRad = Math.asin(Math.sin(latRad) * Math.cos(distanceRad) + Math.cos(latRad) * Math.sin(distanceRad) * Math.cos(headingRad));
+  toLngRad = lngRad + Math.atan2(Math.sin(headingRad) * Math.sin(distanceRad) * Math.cos(latRad), Math.cos(distanceRad) - Math.sin(latRad) * Math.sin(toLatRad));
+  toLngRad = (toLngRad + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
+  return new globeGeometry.LatLng(goog.math.toDegrees(toLatRad), goog.math.toDegrees(toLngRad));
+};
 })();
