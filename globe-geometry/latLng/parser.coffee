@@ -29,12 +29,17 @@ class globeGeometry.latLng.parser
 
   ###*
     @param {string} dmsPair
-    @return {Array | null}
+    @return {Array}
     @private
   ###
   getLatLngParts: (dmsPair) ->
+    parts = dmsPair.split ', '
+    return parts if parts.length == 2
+    parts = dmsPair.split ','
+    return parts if parts.length == 2
     parts = dmsPair.split ' '
-    return parts
+    return parts if parts.length == 2
+    return []
 
   ###*
     @param {string} dms

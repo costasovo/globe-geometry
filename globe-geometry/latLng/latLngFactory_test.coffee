@@ -9,3 +9,7 @@ suite 'globeGeometry.latLng.factory', ->
 
       assert.instanceOf latLng, globeGeometry.LatLng
       assert.isTrue latLng.equals new LatLng 49.208972, 16.598305
+
+    test 'should throw error on invalid input', ->
+      shouldThrow = () -> LatLngFactory.createInstance("xyz")
+      assert.throw shouldThrow, Error, /Invalid input/

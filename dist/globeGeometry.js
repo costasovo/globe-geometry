@@ -2091,8 +2091,19 @@ globeGeometry.latLng.parser.prototype.parseDms = function(dmsPair) {
 };
 globeGeometry.latLng.parser.prototype.getLatLngParts = function(dmsPair) {
   var parts;
+  parts = dmsPair.split(", ");
+  if (parts.length === 2) {
+    return parts;
+  }
+  parts = dmsPair.split(",");
+  if (parts.length === 2) {
+    return parts;
+  }
   parts = dmsPair.split(" ");
-  return parts;
+  if (parts.length === 2) {
+    return parts;
+  }
+  return[];
 };
 globeGeometry.latLng.parser.prototype.parseDmsPart = function(dms) {
   var deg, nums;
