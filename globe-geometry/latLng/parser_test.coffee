@@ -1,6 +1,6 @@
-suite 'globeGeometry.latLngFactory.parser', ->
+suite 'globeGeometry.latLng.parser', ->
 
-  Parser = new globeGeometry.latLngFactory.parser()
+  Parser = new globeGeometry.latLng.parser()
 
   suite 'parseDms', ->
     test 'should work without letters and space separator', ->

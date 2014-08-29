@@ -2029,7 +2029,21 @@ goog.math.safeCeil = function(num, opt_epsilon) {
   goog.asserts.assert(!goog.isDef(opt_epsilon) || opt_epsilon > 0);
   return Math.ceil(num - (opt_epsilon || 2E-15));
 };
+goog.provide("globeGeometry.math");
+goog.require("goog.math");
+globeGeometry.math = function() {
+};
+globeGeometry.math.toFixed = function(num, precision) {
+  var big, zeros;
+  if (precision == null) {
+    precision = 6;
+  }
+  zeros = Math.pow(10, precision);
+  big = Math.abs(num) * zeros;
+  return goog.math.sign(num) * goog.math.safeFloor(big) / zeros;
+};
 goog.provide("globeGeometry.LatLng");
+goog.require("globeGeometry.math");
 goog.require("goog.math");
 globeGeometry.LatLng = function(lat, lng) {
   this.lat = goog.math.clamp(Number(lat), -90, 90);
@@ -2050,20 +2064,71 @@ globeGeometry.LatLng.prototype.toUrlValue = function(precision) {
   if (precision == null) {
     precision = 6;
   }
-  lat = this.round(this.getLat(), precision);
-  lng = this.round(this.getLng(), precision);
+  lat = globeGeometry.math.toFixed(this.getLat(), precision);
+  lng = globeGeometry.math.toFixed(this.getLng(), precision);
   return Number(lat) + "," + Number(lng);
 };
 globeGeometry.LatLng.prototype.equals = function(other) {
   return goog.math.nearlyEquals(this.getLat(), other.getLat()) && goog.math.nearlyEquals(this.getLng(), other.getLng());
 };
-globeGeometry.LatLng.prototype.round = function(num, precision) {
-  var big;
-  if (precision == null) {
-    precision = this.PRECISION;
+goog.provide("globeGeometry.latLng.parser");
+goog.require("goog.array");
+goog.require("globeGeometry.math");
+globeGeometry.latLng.parser = function() {
+};
+globeGeometry.latLng.parser.prototype.parseDms = function(dmsPair) {
+  var lat, lng, parts;
+  parts = this.getLatLngParts(dmsPair);
+  if (parts.length !== 2) {
+    return null;
   }
-  big = Math.abs(num) * Math.pow(10, precision);
-  return goog.math.sign(num) * goog.math.safeFloor(big) / Math.pow(10, precision);
+  lat = this.parseDmsPart(parts[0]);
+  lng = this.parseDmsPart(parts[1]);
+  if (!goog.isNumber(lat) || !goog.isNumber(lng)) {
+    return null;
+  }
+  return[lat, lng];
+};
+globeGeometry.latLng.parser.prototype.getLatLngParts = function(dmsPair) {
+  var parts;
+  parts = dmsPair.split(" ");
+  return parts;
+};
+globeGeometry.latLng.parser.prototype.parseDmsPart = function(dms) {
+  var deg, nums;
+  nums = this.getNumericParts(dms, 3);
+  if (!goog.isArray(nums)) {
+    return null;
+  }
+  deg = nums[0] + nums[1] / 60 + nums[2] / 3600;
+  return globeGeometry.math.toFixed(deg, 6);
+};
+globeGeometry.latLng.parser.prototype.getNumericParts = function(str, count) {
+  var nums;
+  nums = str.split(/[^0-9.,]+/);
+  if (goog.array.peek(nums) === "") {
+    nums.pop();
+  }
+  if (nums.length !== count) {
+    return null;
+  }
+  return goog.array.map(nums, function(num) {
+    return goog.string.toNumber(num);
+  });
+};
+goog.provide("globeGeometry.latLng.factory");
+goog.require("globeGeometry.latLng.parser");
+goog.require("globeGeometry.LatLng");
+globeGeometry.latLng.factory = function() {
+};
+globeGeometry.latLng.factory.createInstance = function(input) {
+  var latLng, parser;
+  parser = new globeGeometry.latLng.parser;
+  latLng = parser.parseDms(input);
+  if (!goog.isArray(latLng)) {
+    throw Error("Invalid input");
+  }
+  return new globeGeometry.LatLng(latLng[0], latLng[1]);
 };
 goog.provide("globeGeometry.spherical");
 goog.require("goog.math");
