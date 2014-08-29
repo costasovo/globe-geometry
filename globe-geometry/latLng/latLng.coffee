@@ -4,6 +4,7 @@
 
 goog.provide 'globeGeometry.LatLng'
 
+goog.require 'globeGeometry.math'
 goog.require 'goog.math'
 
 class globeGeometry.LatLng
@@ -50,8 +51,8 @@ class globeGeometry.LatLng
     @export
   ###
   toUrlValue: (precision = 6) ->
-    lat = @round @getLat(), precision
-    lng = @round @getLng(), precision
+    lat = globeGeometry.math.toFixed @getLat(), precision
+    lng = globeGeometry.math.toFixed @getLng(), precision
     return Number(lat) + ',' + Number(lng)
 
   ###*
@@ -62,12 +63,3 @@ class globeGeometry.LatLng
   equals: (other) ->
     return goog.math.nearlyEquals(@getLat(), other.getLat()) && goog.math.nearlyEquals(@getLng(), other.getLng())
 
-  ###*
-    @param {number} num
-    @param {number=} precision
-    @return {number}
-    @private
-  ###
-  round: (num, precision = @PRECISION) ->
-    big = Math.abs(num) * Math.pow(10, precision)
-    return goog.math.sign(num) * goog.math.safeFloor(big) / Math.pow(10, precision)
