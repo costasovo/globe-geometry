@@ -4,6 +4,6 @@
   "private": true,
   "dependencies": {
     "closure-compiler": "http://dl.google.com/closure-compiler/compiler-latest.zip",
-    "closure-library": "https://github.com/google/closure-library.git#f8c37e747e9425d7b8bc36a686cf6a90b5e99c99"
+    "closure-library": "https://github.com/google/closure-library.git"
   }
 }
