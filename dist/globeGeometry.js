@@ -2090,20 +2090,29 @@ globeGeometry.latLng.parser.prototype.parseDms = function(dmsPair) {
   return[lat, lng];
 };
 globeGeometry.latLng.parser.prototype.getLatLngParts = function(dmsPair) {
-  var parts;
-  parts = dmsPair.split(", ");
-  if (parts.length === 2) {
-    return parts;
+  var delimiter, delimiters, parts, _i, _len;
+  delimiters = [", ", ","];
+  for (_i = 0, _len = delimiters.length;_i < _len;_i++) {
+    delimiter = delimiters[_i];
+    parts = dmsPair.split(delimiter);
+    if (parts.length === 2) {
+      return parts;
+    }
   }
-  parts = dmsPair.split(",");
-  if (parts.length === 2) {
-    return parts;
-  }
+  return this.getLatLngPartsSeparatedBySpace(dmsPair);
+};
+globeGeometry.latLng.parser.prototype.getLatLngPartsSeparatedBySpace = function(dmsPair) {
+  var lat, lng, parts;
   parts = dmsPair.split(" ");
-  if (parts.length === 2) {
-    return parts;
+  if (parts.length < 2) {
+    return[];
   }
-  return[];
+  if (parts.length % 2 === 1) {
+    return[];
+  }
+  lat = goog.array.slice(parts, 0, parts.length / 2).join("");
+  lng = goog.array.slice(parts, parts.length / 2).join("");
+  return[lat, lng];
 };
 globeGeometry.latLng.parser.prototype.parseDmsPart = function(dms) {
   var deg, nums;

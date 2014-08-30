@@ -33,13 +33,24 @@ class globeGeometry.latLng.parser
     @private
   ###
   getLatLngParts: (dmsPair) ->
-    parts = dmsPair.split ', '
-    return parts if parts.length == 2
-    parts = dmsPair.split ','
-    return parts if parts.length == 2
+    delimiters = [', ', ',']
+    for delimiter in delimiters
+      parts = dmsPair.split delimiter
+      return parts if parts.length == 2
+    return @getLatLngPartsSeparatedBySpace dmsPair
+
+  ###*
+    @param {string} dmsPair
+    @return {Array}
+    @private
+  ###
+  getLatLngPartsSeparatedBySpace: (dmsPair) ->
     parts = dmsPair.split ' '
-    return parts if parts.length == 2
-    return []
+    return [] if parts.length < 2
+    return [] if parts.length % 2 == 1
+    lat = goog.array.slice(parts, 0, parts.length / 2).join ''
+    lng = goog.array.slice(parts, parts.length / 2).join ''
+    return [lat, lng]
 
   ###*
     @param {string} dms
