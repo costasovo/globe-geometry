@@ -4,7 +4,7 @@ suite 'globeGeometry.latLng.factory', ->
   LatLngFactory = globeGeometry.latLng.factory
 
   suite 'createInstance', ->
-    test 'should work without DMS input', ->
+    test 'should work with DMS input', ->
       latLng = LatLngFactory.createInstance "49°12'32.3\" 16°35'53.9\""
 
       assert.instanceOf latLng, globeGeometry.LatLng
@@ -13,3 +13,9 @@ suite 'globeGeometry.latLng.factory', ->
     test 'should throw error on invalid input', ->
       shouldThrow = () -> LatLngFactory.createInstance("xyz")
       assert.throw shouldThrow, Error, /Invalid input/
+
+    test 'should work with DDM input', ->
+      latLng = LatLngFactory.createInstance "32° 18.385',122° 36.875'"
+
+      assert.instanceOf latLng, globeGeometry.LatLng
+      assert.isTrue latLng.equals new LatLng 32.306416, 122.614583

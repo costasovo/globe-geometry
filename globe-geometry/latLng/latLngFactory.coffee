@@ -17,5 +17,8 @@ class globeGeometry.latLng.factory
   @createInstance: (input) ->
     parser = new globeGeometry.latLng.parser()
     latLng = parser.parseDms input
+    latLng = parser.parseDdm input if !goog.isArray latLng
+
     throw Error 'Invalid input' if !goog.isArray latLng
+
     return new globeGeometry.LatLng latLng[0], latLng[1]
