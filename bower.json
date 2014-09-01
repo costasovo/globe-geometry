@@ -1,8 +1,9 @@
 {
   "name": "globe-geometry",
   "version": "0.2.0",
+  "main": ["dist/globeGeometry.js", "dist/globeGeometry.min.js"],
   "private": true,
-  "dependencies": {
+  "devDependencies": {
     "closure-compiler": "http://dl.google.com/closure-compiler/compiler-latest.zip",
     "closure-library": "https://github.com/google/closure-library.git"
   }
