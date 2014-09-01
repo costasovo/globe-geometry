@@ -29,3 +29,15 @@ suite 'globeGeometry.latLng.parser', ->
       for input in inputs
         latLng = Parser.parseDdm input
         assert.sameMembers latLng, [32.306416, 122.614583], 'Failed to parse ' + input
+
+  suite 'parseDd', ->
+    test 'should work with various input formats', ->
+      inputs = [
+        "32.30642° N 122.61458° W"
+        "32.30642° N, 122.61458° W"
+        "32.30642°N 122.61458°W"
+        "32.30642°N,122.61458°W"
+      ]
+      for input in inputs
+        latLng = Parser.parseDd input
+        assert.sameMembers latLng, [32.30642, 122.61458], 'Failed to parse ' + input

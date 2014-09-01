@@ -2102,6 +2102,19 @@ globeGeometry.latLng.parser.prototype.parseDdm = function(ddmPair) {
   }
   return[lat, lng];
 };
+globeGeometry.latLng.parser.prototype.parseDd = function(ddPair) {
+  var lat, lng, parts;
+  parts = this.getLatLngParts(ddPair);
+  if (parts.length !== 2) {
+    return null;
+  }
+  lat = this.parseDdPart(parts[0]);
+  lng = this.parseDdPart(parts[1]);
+  if (!goog.isNumber(lat) || !goog.isNumber(lng)) {
+    return null;
+  }
+  return[lat, lng];
+};
 globeGeometry.latLng.parser.prototype.getLatLngParts = function(dmsPair) {
   var delimiter, delimiters, parts, _i, _len;
   delimiters = [", ", ","];
@@ -2145,6 +2158,14 @@ globeGeometry.latLng.parser.prototype.parseDdmPart = function(ddm) {
   deg = nums[0] + nums[1] / 60;
   return globeGeometry.math.toFixed(deg, 6);
 };
+globeGeometry.latLng.parser.prototype.parseDdPart = function(dd) {
+  var nums;
+  nums = this.getNumericParts(dd, 1);
+  if (!goog.isArray(nums)) {
+    return null;
+  }
+  return globeGeometry.math.toFixed(nums[0], 6);
+};
 globeGeometry.latLng.parser.prototype.getNumericParts = function(str, count) {
   var nums;
   nums = str.split(/[^0-9.,]+/);
@@ -2169,6 +2190,9 @@ globeGeometry.latLng.factory.createInstance = function(input) {
   latLng = parser.parseDms(input);
   if (!goog.isArray(latLng)) {
     latLng = parser.parseDdm(input);
+  }
+  if (!goog.isArray(latLng)) {
+    latLng = parser.parseDd(input);
   }
   if (!goog.isArray(latLng)) {
     throw Error("Invalid input");

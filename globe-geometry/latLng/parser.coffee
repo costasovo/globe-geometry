@@ -40,6 +40,18 @@ class globeGeometry.latLng.parser
     return [lat, lng]
 
   ###*
+    @param {string} ddPair
+    @return {Array | null}
+  ###
+  parseDd: (ddPair) ->
+    parts = @getLatLngParts ddPair
+    return null if parts.length != 2
+    lat = @parseDdPart parts[0]
+    lng = @parseDdPart parts[1]
+    return null if (!goog.isNumber(lat) || !goog.isNumber(lng))
+    return [lat, lng]
+
+  ###*
     @param {string} dmsPair
     @return {Array}
     @private
@@ -85,6 +97,16 @@ class globeGeometry.latLng.parser
     return null if !goog.isArray nums
     deg = nums[0] + nums[1]/60
     return globeGeometry.math.toFixed deg, 6
+
+  ###*
+    @param {string} dd
+    @return {number | null}
+    @private
+  ###
+  parseDdPart: (dd) ->
+    nums = @getNumericParts dd, 1
+    return null if !goog.isArray nums
+    return globeGeometry.math.toFixed nums[0], 6
 
   ###*
     @param {string} str

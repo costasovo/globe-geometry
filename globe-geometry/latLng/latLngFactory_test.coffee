@@ -19,3 +19,9 @@ suite 'globeGeometry.latLng.factory', ->
 
       assert.instanceOf latLng, globeGeometry.LatLng
       assert.isTrue latLng.equals new LatLng 32.306416, 122.614583
+
+    test 'should work with DD input', ->
+      latLng = LatLngFactory.createInstance "32.30642°N 122.61458°W"
+
+      assert.instanceOf latLng, globeGeometry.LatLng
+      assert.isTrue latLng.equals new LatLng 32.30642, 122.61458
