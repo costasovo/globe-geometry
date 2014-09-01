@@ -17,7 +17,16 @@ Written in CoffeeScript and powered by http://github.com/steida/este-library
   var heading = globeGeometry.spherical.computeHeading(barcelona, nyc);
   var length = globeGeometry.spherical.computeLength([brno, barcelona, nyc]);
 
-  var london = globeGeometry.spherical.computeOffset brno, 1209636, -71.4224
+  var london = globeGeometry.spherical.computeOffset(brno, 1209636, -71.4224);
+  ```
+
+Different input formats support:
+
+  ```javascript
+  var latLng = globeGeometry.latLng.factory.createInstance("41°23'41.2\"N 2°08'55.6\"E");
+  var latLng = globeGeometry.latLng.factory.createInstance("41°23'41.2\", 2°08'55.6\"");
+  var latLng = globeGeometry.latLng.factory.createInstance("41° 23.68666', 2° 8.9266667'");
+  var latLng = globeGeometry.latLng.factory.createInstance("41.39477777°N, 2.1487777778°E");
   ```
 
 ## Dev
