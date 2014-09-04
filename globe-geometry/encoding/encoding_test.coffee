@@ -32,18 +32,31 @@ suite 'globeGeometry.encoding', ->
       encodedPath = Encoding.encodePath path
       assert.equal encodedPath, '_p~iF~ps|U_ulLnnqC_mqNvxq`@'
 
-  suite 'decodeUnsignedNumber', ->
+  suite 'decodeUnsignedNumbers', ->
     test 'should work with integer', ->
-      num = Encoding.decodeUnsignedNumber 'mD'
+      num = Encoding.decodeUnsignedNumbers('mD')[0]
       assert.equal num, 174
 
-  suite 'decodeSignedNumber', ->
+  suite 'decodeSignedNumbers', ->
     test 'should work with negative float', ->
-      num = Encoding.decodeSignedNumber '`~oia@'
+      num = Encoding.decodeSignedNumbers '`~oia@'
       assert.equal num, -179.98321
-      num = Encoding.decodeSignedNumber '~ps|U'
+      num = Encoding.decodeSignedNumbers '~ps|U'
       assert.equal num, -120.2
 
     test 'should work with float', ->
-      num = Encoding.decodeSignedNumber '_p~iF'
+      num = Encoding.decodeSignedNumbers '_p~iF'
       assert.equal num, 38.5
+
+  suite 'decodePath', ->
+    test 'should decode path', ->
+      path = [
+        new LatLng 38.5, -120.2
+        new LatLng 40.7, -120.95
+        new LatLng 43.252, -126.453
+      ]
+      decodedPath = Encoding.decodePath '_p~iF~ps|U_ulLnnqC_mqNvxq`@'
+      assert.isArray decodedPath
+      assert.lengthOf decodedPath, 3
+      for latLng, i in decodedPath
+        assert.isTrue latLng.equals path[i]

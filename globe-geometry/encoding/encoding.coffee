@@ -26,6 +26,23 @@ class globeGeometry.encoding
     return encoded
 
   ###*
+    @param {string} path
+    @return {Array.<globeGeometry.LatLng>}
+    @export
+    @see https://developers.google.com/maps/documentation/utilities/polylinealgorithm
+  ###
+  @decodePath: (path) ->
+    nums = globeGeometry.encoding.decodeSignedNumbers path
+    lat = lng = 0
+    points = []
+    for num, i in nums
+      lat += num if i % 2 == 0
+      lng += num if i % 2 == 1
+      if i > 0 && i % 2 == 1
+        points.push new globeGeometry.LatLng lat, lng
+    return points
+
+  ###*
     @param {number} value
     @return {string}
     @see https://developers.google.com/maps/documentation/utilities/polylinealgorithm
@@ -55,29 +72,31 @@ class globeGeometry.encoding
 
   ###*
     @param {string} encoded
-    @return {number}
+    @return {Array.<number>}
     @see https://developers.google.com/maps/documentation/utilities/polylinealgorithm
     @see http://cheateinstein.com/category-php/decoding-polyline-algorithm-format-javascriptphp/
   ###
-  @decodeUnsignedNumber: (encoded) ->
-    index = result = shift = 0
-    loop
-      b = encoded.charCodeAt(index++) - 63;
-      result |= (b & 0x1f) << shift
-      shift += 5
-      break unless b >= 0x20
-    return result
+  @decodeUnsignedNumbers: (encoded) ->
+    index = 0; nums = []
+    while index < encoded.length
+      num = shift = 0
+      loop
+        b = encoded.charCodeAt(index++) - 63;
+        num |= (b & 0x1f) << shift
+        shift += 5
+        break unless b >= 0x20
+      nums.push num
+    return nums
 
   ###*
     @param {string} encoded
-    @return {number}
+    @return {Array.<number>}
     @see https://developers.google.com/maps/documentation/utilities/polylinealgorithm
     @see http://cheateinstein.com/category-php/decoding-polyline-algorithm-format-javascriptphp/
   ###
-  @decodeSignedNumber: (encoded) ->
-    num = globeGeometry.encoding.decodeUnsignedNumber encoded
-    if num & 1
-      num = ~(num >> 1)
-    else
-      num = num >> 1
-    return num / 1e5
+  @decodeSignedNumbers: (encoded) ->
+    nums = globeGeometry.encoding.decodeUnsignedNumbers encoded
+    for num, i in nums
+      num = if (num & 1) then ~(num >> 1) else (num >> 1)
+      nums[i] = num / 1e5
+    return nums

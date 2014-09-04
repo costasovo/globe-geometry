@@ -2089,6 +2089,25 @@ globeGeometry.encoding.encodePath = function(path) {
   }
   return encoded;
 };
+globeGeometry.encoding.decodePath = function(path) {
+  var i, lat, lng, num, nums, points, _i, _len;
+  nums = globeGeometry.encoding.decodeSignedNumbers(path);
+  lat = lng = 0;
+  points = [];
+  for (i = _i = 0, _len = nums.length;_i < _len;i = ++_i) {
+    num = nums[i];
+    if (i % 2 === 0) {
+      lat += num;
+    }
+    if (i % 2 === 1) {
+      lng += num;
+    }
+    if (i > 0 && i % 2 === 1) {
+      points.push(new globeGeometry.LatLng(lat, lng));
+    }
+  }
+  return points;
+};
 globeGeometry.encoding.encodeUnsignedNumber = function(value) {
   var encoded;
   encoded = "";
@@ -2107,6 +2126,34 @@ globeGeometry.encoding.encodeSignedNumber = function(value) {
     num = ~num;
   }
   return globeGeometry.encoding.encodeUnsignedNumber(num);
+};
+globeGeometry.encoding.decodeUnsignedNumbers = function(encoded) {
+  var b, index, num, nums, shift;
+  index = 0;
+  nums = [];
+  while (index < encoded.length) {
+    num = shift = 0;
+    while (true) {
+      b = encoded.charCodeAt(index++) - 63;
+      num |= (b & 31) << shift;
+      shift += 5;
+      if (!(b >= 32)) {
+        break;
+      }
+    }
+    nums.push(num);
+  }
+  return nums;
+};
+globeGeometry.encoding.decodeSignedNumbers = function(encoded) {
+  var i, num, nums, _i, _len;
+  nums = globeGeometry.encoding.decodeUnsignedNumbers(encoded);
+  for (i = _i = 0, _len = nums.length;_i < _len;i = ++_i) {
+    num = nums[i];
+    num = num & 1 ? ~(num >> 1) : num >> 1;
+    nums[i] = num / 1E5;
+  }
+  return nums;
 };
 goog.provide("globeGeometry.latLng.parser");
 goog.require("goog.array");
