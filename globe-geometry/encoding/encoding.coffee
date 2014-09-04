@@ -67,13 +67,15 @@ class globeGeometry.encoding
       shift += 5
       break unless b >= 0x20
     return result
-    # if result & 1
-    #   return ~(result >> 1)
-    # else
-    #   return result >> 1
 
+  ###*
+    @param {string} encoded
+    @return {number}
+    @see https://developers.google.com/maps/documentation/utilities/polylinealgorithm
+    @see http://cheateinstein.com/category-php/decoding-polyline-algorithm-format-javascriptphp/
+  ###
   @decodeSignedNumber: (encoded) ->
-    num = @decodeUnsignedNumber encoded
+    num = globeGeometry.encoding.decodeUnsignedNumber encoded
     if num & 1
       num = ~(num >> 1)
     else
