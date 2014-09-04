@@ -53,3 +53,29 @@ class globeGeometry.encoding
 
     return globeGeometry.encoding.encodeUnsignedNumber num
 
+  ###*
+    @param {string} encoded
+    @return {number}
+    @see https://developers.google.com/maps/documentation/utilities/polylinealgorithm
+    @see http://cheateinstein.com/category-php/decoding-polyline-algorithm-format-javascriptphp/
+  ###
+  @decodeUnsignedNumber: (encoded) ->
+    index = result = shift = 0
+    loop
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift
+      shift += 5
+      break unless b >= 0x20
+    return result
+    # if result & 1
+    #   return ~(result >> 1)
+    # else
+    #   return result >> 1
+
+  @decodeSignedNumber: (encoded) ->
+    num = @decodeUnsignedNumber encoded
+    if num & 1
+      num = ~(num >> 1)
+    else
+      num = num >> 1
+    return num / 1e5

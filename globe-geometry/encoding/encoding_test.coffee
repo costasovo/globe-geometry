@@ -18,7 +18,7 @@ suite 'globeGeometry.encoding', ->
       enc = Encoding.encodeSignedNumber -120.2
       assert.equal enc, '~ps|U'
 
-    test.skip 'should work with float', ->
+    test 'should work with float', ->
       enc = Encoding.encodeSignedNumber 38.5
       assert.equal enc, '_p~iF'
 
@@ -31,3 +31,19 @@ suite 'globeGeometry.encoding', ->
       ]
       encodedPath = Encoding.encodePath path
       assert.equal encodedPath, '_p~iF~ps|U_ulLnnqC_mqNvxq`@'
+
+  suite 'decodeUnsignedNumber', ->
+    test 'should work with integer', ->
+      num = Encoding.decodeUnsignedNumber 'mD'
+      assert.equal num, 174
+
+  suite 'decodeSignedNumber', ->
+    test 'should work with negative float', ->
+      num = Encoding.decodeSignedNumber '`~oia@'
+      assert.equal num, -179.98321
+      num = Encoding.decodeSignedNumber '~ps|U'
+      assert.equal num, -120.2
+
+    test 'should work with float', ->
+      num = Encoding.decodeSignedNumber '_p~iF'
+      assert.equal num, 38.5
