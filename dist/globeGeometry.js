@@ -2071,6 +2071,43 @@ globeGeometry.LatLng.prototype.toUrlValue = function(precision) {
 globeGeometry.LatLng.prototype.equals = function(other) {
   return goog.math.nearlyEquals(this.getLat(), other.getLat()) && goog.math.nearlyEquals(this.getLng(), other.getLng());
 };
+goog.provide("globeGeometry.encoding");
+goog.require("globeGeometry.LatLng");
+globeGeometry.encoding = function() {
+};
+globeGeometry.encoding.encodePath = function(path) {
+  var encoded, latOffset, lngOffset, point, prev, _i, _len;
+  encoded = "";
+  prev = new globeGeometry.LatLng(0, 0);
+  for (_i = 0, _len = path.length;_i < _len;_i++) {
+    point = path[_i];
+    latOffset = point.getLat() - prev.getLat();
+    lngOffset = point.getLng() - prev.getLng();
+    encoded += globeGeometry.encoding.encodeSignedNumber(latOffset);
+    encoded += globeGeometry.encoding.encodeSignedNumber(lngOffset);
+    prev = point;
+  }
+  return encoded;
+};
+globeGeometry.encoding.encodeUnsignedNumber = function(value) {
+  var encoded;
+  encoded = "";
+  while (value >= 32) {
+    encoded += String.fromCharCode((32 | value & 31) + 63);
+    value >>= 5;
+  }
+  encoded += String.fromCharCode(value + 63);
+  return encoded;
+};
+globeGeometry.encoding.encodeSignedNumber = function(value) {
+  var num;
+  value = Math.round(value * 1E5);
+  num = value << 1;
+  if (value < 0) {
+    num = ~num;
+  }
+  return globeGeometry.encoding.encodeUnsignedNumber(num);
+};
 goog.provide("globeGeometry.latLng.parser");
 goog.require("goog.array");
 goog.require("globeGeometry.math");
