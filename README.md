@@ -29,7 +29,7 @@ Written in CoffeeScript and powered by http://github.com/steida/este-library
   var latLng = globeGeometry.latLng.factory.createInstance("41.39477777°N, 2.1487777778°E");
   ```
 
-  Encode a sequence of LatLngs into an encoded path string:
+  Encoding:
 
   ```javascript
   var path = [
@@ -38,6 +38,7 @@ Written in CoffeeScript and powered by http://github.com/steida/este-library
     new globeGeometry.LatLng(43.252, -126.453)
   ];
   var encodedPath = globeGeometry.encoding.encodePath(path);
+  var points = globeGeometry.encoding.decodePath(encodedPath);
   ```
 
 ## Dev
