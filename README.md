@@ -20,13 +20,24 @@ Written in CoffeeScript and powered by http://github.com/steida/este-library
   var london = globeGeometry.spherical.computeOffset(brno, 1209636, -71.4224);
   ```
 
-Different input formats support:
+  Different input formats support:
 
   ```javascript
   var latLng = globeGeometry.latLng.factory.createInstance("41°23'41.2\"N 2°08'55.6\"E");
   var latLng = globeGeometry.latLng.factory.createInstance("41°23'41.2\", 2°08'55.6\"");
   var latLng = globeGeometry.latLng.factory.createInstance("41° 23.68666', 2° 8.9266667'");
   var latLng = globeGeometry.latLng.factory.createInstance("41.39477777°N, 2.1487777778°E");
+  ```
+
+  Encode a sequence of LatLngs into an encoded path string:
+
+  ```javascript
+  var path = [
+    new globeGeometry.LatLng(38.5, -120.2),
+    new globeGeometry.LatLng(40.7, -120.95),
+    new globeGeometry.LatLng(43.252, -126.453)
+  ];
+  var encodedPath = globeGeometry.encoding.encodePath(path);
   ```
 
 ## Dev
