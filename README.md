@@ -6,7 +6,7 @@ Written in CoffeeScript and powered by http://github.com/steida/este-library
 
 ## Usage
 
-  Get compiled JS in `dist` dir.
+  Get compiled JS in `dist` dir. Try the [demo](http://michalsanger.github.io/globe-geometry/).
 
   ```javascript
   var brno = new globeGeometry.LatLng('49.2020701', '16.5779606');
