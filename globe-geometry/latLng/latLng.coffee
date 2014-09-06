@@ -86,6 +86,21 @@ class globeGeometry.LatLng
     return lat + '°' + latLetter + separator + lng + '°' + lngLetter
 
   ###*
+    @param {string} separator
+    @param {number} precision
+    @return {string}
+    @export
+  ###
+  toDdm: (separator = ' ', precision = 4) ->
+    dLat = globeGeometry.math.toFixed Math.abs(@getLat()), 0
+    dLng = globeGeometry.math.toFixed Math.abs(@getLng()), 0
+    mLat = globeGeometry.math.toFixed (Math.abs(@getLat()) - dLat)*60, precision
+    mLng = globeGeometry.math.toFixed (Math.abs(@getLng()) - dLng)*60, precision
+    latLetter = if @getLat() < 0 then 'S' else 'N'
+    lngLetter = if @getLng() < 0 then 'E' else 'W'
+    return dLat + '°' + mLat + "'" + latLetter + separator + dLng + '°' + mLng + "'" + lngLetter
+
+  ###*
     @param {globeGeometry.LatLng} other
     @return {boolean}
     @export
