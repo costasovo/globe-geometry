@@ -73,6 +73,19 @@ class globeGeometry.LatLng
     return Number(lat) + ',' + Number(lng)
 
   ###*
+    @param {string} separator
+    @param {number} precision
+    @return {string}
+    @export
+  ###
+  toDd: (separator = ' ', precision = 6) ->
+    lat = globeGeometry.math.toFixed Math.abs(@getLat()), precision
+    lng = globeGeometry.math.toFixed Math.abs(@getLng()), precision
+    latLetter = if @getLat() < 0 then 'S' else 'N'
+    lngLetter = if @getLng() < 0 then 'E' else 'W'
+    return lat + '°' + latLetter + separator + lng + '°' + lngLetter
+
+  ###*
     @param {globeGeometry.LatLng} other
     @return {boolean}
     @export

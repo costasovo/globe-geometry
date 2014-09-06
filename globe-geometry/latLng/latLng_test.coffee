@@ -99,3 +99,28 @@ suite 'globeGeometry.LatLng', ->
 
       assert.instanceOf latLng, globeGeometry.LatLng
       assert.isTrue latLng.equals new LatLng 32.30642, 122.61458
+
+  suite 'toDd', ->
+    test 'should work', ->
+      latLng = new LatLng 32.30642, 122.61458
+      dd = latLng.toDd()
+
+      assert.equal dd, "32.30642°N 122.61458°W"
+
+    test 'should work with separator', ->
+      latLng = new LatLng 32.30642, 122.61458
+      dd = latLng.toDd(',')
+
+      assert.equal dd, "32.30642°N,122.61458°W"
+
+    test 'should work with precision', ->
+      latLng = new LatLng 32.30642, 122.61458
+      dd = latLng.toDd(' ', 3)
+
+      assert.equal dd, "32.306°N 122.614°W"
+
+    test 'should work with negative numbers', ->
+      latLng = new LatLng -32.30642, -122.61458
+      dd = latLng.toDd()
+
+      assert.equal dd, "32.30642°S 122.61458°E"
