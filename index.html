@@ -65,7 +65,7 @@
     $(document).ready(function(){
     	$("#converter-form button").on("click", function(event) {
 			var input = $(this).prev().val();
-			var latLng = globeGeometry.latLng.factory.createInstance(input);
+			var latLng = globeGeometry.LatLng.createInstance(input);
 			$(this).next().val(latLng.toUrlValue()).focus();
 		});
     });
