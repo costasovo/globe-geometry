@@ -76,3 +76,26 @@ suite 'globeGeometry.LatLng', ->
         latLng = new LatLng data[0], data[1]
         latLng2 = new LatLng data[2], data[3]
         assert.isTrue latLng.equals(latLng2), latLng.toString() + ' === ' + latLng2.toString()
+
+  suite 'createInstance', ->
+    test 'should work with DMS input', ->
+      latLng = LatLng.createInstance "49°12'32.3\" 16°35'53.9\""
+
+      assert.instanceOf latLng, globeGeometry.LatLng
+      assert.isTrue latLng.equals new LatLng 49.208972, 16.598305
+
+    test 'should throw error on invalid input', ->
+      shouldThrow = () -> LatLng.createInstance("xyz")
+      assert.throw shouldThrow, Error, /Invalid input/
+
+    test 'should work with DDM input', ->
+      latLng = LatLng.createInstance "32° 18.385',122° 36.875'"
+
+      assert.instanceOf latLng, globeGeometry.LatLng
+      assert.isTrue latLng.equals new LatLng 32.306416, 122.614583
+
+    test 'should work with DD input', ->
+      latLng = LatLng.createInstance "32.30642°N 122.61458°W"
+
+      assert.instanceOf latLng, globeGeometry.LatLng
+      assert.isTrue latLng.equals new LatLng 32.30642, 122.61458

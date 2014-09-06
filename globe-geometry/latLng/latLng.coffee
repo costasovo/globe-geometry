@@ -4,6 +4,7 @@
 
 goog.provide 'globeGeometry.LatLng'
 
+goog.require 'globeGeometry.latLng.parser'
 goog.require 'globeGeometry.math'
 goog.require 'goog.math'
 
@@ -25,6 +26,22 @@ class globeGeometry.LatLng
   constructor: (lat, lng) ->
     @lat = goog.math.clamp Number(lat), -90, 90
     @lng = goog.math.clamp Number(lng), -180, 180
+
+  ###*
+    Factory for creating LatLng instances from various input data formats
+    @param {string} input
+    @return {globeGeometry.LatLng}
+    @export
+  ###
+  @createInstance: (input) ->
+    parser = new globeGeometry.latLng.parser()
+    latLng = parser.parseDms input
+    latLng = parser.parseDdm input if !goog.isArray latLng
+    latLng = parser.parseDd input if !goog.isArray latLng
+
+    throw Error 'Invalid input' if !goog.isArray latLng
+
+    return new globeGeometry.LatLng latLng[0], latLng[1]
 
   ###*
     @return {number}
