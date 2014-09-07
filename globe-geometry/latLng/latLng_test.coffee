@@ -130,4 +130,10 @@ suite 'globeGeometry.LatLng', ->
       latLng = new LatLng 32.306416, 122.614583
       ddm = latLng.toDdm()
 
-      assert.equal ddm, "32°18.3849'N 122°36.8749'W"
+      assert.equal ddm, "32°18.385'N 122°36.875'W"
+
+  suite 'toDms', ->
+    test 'should work', ->
+      latLng = new LatLng 49.208972, 16.598305
+      dms = latLng.toDms()
+      assert.equal dms, "49°12'32.3\"N 16°35'53.9\"W"

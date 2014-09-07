@@ -91,14 +91,35 @@ class globeGeometry.LatLng
     @return {string}
     @export
   ###
-  toDdm: (separator = ' ', precision = 4) ->
-    dLat = globeGeometry.math.toFixed Math.abs(@getLat()), 0
-    dLng = globeGeometry.math.toFixed Math.abs(@getLng()), 0
-    mLat = globeGeometry.math.toFixed (Math.abs(@getLat()) - dLat)*60, precision
-    mLng = globeGeometry.math.toFixed (Math.abs(@getLng()) - dLng)*60, precision
+  toDdm: (separator = ' ', precision = 3) ->
+    lat = Math.abs @getLat()
+    lng = Math.abs @getLng()
+    dLat = globeGeometry.math.toFixed lat, 0
+    dLng = globeGeometry.math.toFixed lng, 0
+    mLat = globeGeometry.math.round (lat - dLat)*60, precision
+    mLng = globeGeometry.math.round (lng - dLng)*60, precision
     latLetter = if @getLat() < 0 then 'S' else 'N'
     lngLetter = if @getLng() < 0 then 'E' else 'W'
     return dLat + '°' + mLat + "'" + latLetter + separator + dLng + '°' + mLng + "'" + lngLetter
+
+  ###*
+    @param {string} separator
+    @param {number} precision
+    @return {string}
+    @export
+  ###
+  toDms: (separator = ' ', precision = 1) ->
+    lat = Math.abs @getLat()
+    lng = Math.abs @getLng()
+    dLat = globeGeometry.math.toFixed lat, 0
+    dLng = globeGeometry.math.toFixed lng, 0
+    mLat = globeGeometry.math.toFixed (lat - dLat)*60, 0
+    mLng = globeGeometry.math.toFixed (lng - dLng)*60, 0
+    sLat = globeGeometry.math.round (lat - dLat - mLat/60)*3600, precision
+    sLng = globeGeometry.math.round (lng - dLng - mLng/60)*3600, precision
+    latLetter = if @getLat() < 0 then 'S' else 'N'
+    lngLetter = if @getLng() < 0 then 'E' else 'W'
+    return dLat + '°' + mLat + "'" + sLat + '"' + latLetter + separator + dLng + '°' + mLng + "'" + sLng + '"' + lngLetter
 
   ###*
     @param {globeGeometry.LatLng} other

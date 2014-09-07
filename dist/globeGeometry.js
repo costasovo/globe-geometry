@@ -57,34 +57,6 @@ goog.provide = function(name) {
   }
   goog.exportPath_(name);
 };
-goog.module = function(name) {
-  if (!goog.isString(name) || !name) {
-    throw Error("Invalid module identifier");
-  }
-  if (!goog.isInModuleLoader_()) {
-    throw Error("Module " + name + " has been loaded incorrectly.");
-  }
-  if (goog.moduleLoaderState_.moduleName) {
-    throw Error("goog.module may only be called once per module.");
-  }
-  goog.moduleLoaderState_.moduleName = name;
-  if (!COMPILED) {
-    if (goog.isProvided_(name)) {
-      throw Error('Namespace "' + name + '" already declared.');
-    }
-    delete goog.implicitNamespaces_[name];
-  }
-};
-goog.moduleLoaderState_ = null;
-goog.isInModuleLoader_ = function() {
-  return goog.moduleLoaderState_ != null;
-};
-goog.module.declareTestMethods = function() {
-  if (!goog.isInModuleLoader_()) {
-    throw new Error("goog.module.declareTestMethods must be called from " + "within a goog.module");
-  }
-  goog.moduleLoaderState_.declareTestMethods = true;
-};
 goog.setTestOnly = function(opt_message) {
   if (COMPILED && !goog.DEBUG) {
     opt_message = opt_message || "";
@@ -95,9 +67,9 @@ goog.forwardDeclare = function(name) {
 };
 if (!COMPILED) {
   goog.isProvided_ = function(name) {
-    return name in goog.loadedModules_ || !goog.implicitNamespaces_[name] && goog.isDefAndNotNull(goog.getObjectByName(name));
+    return!goog.implicitNamespaces_[name] && goog.isDefAndNotNull(goog.getObjectByName(name));
   };
-  goog.implicitNamespaces_ = {"goog.module":true};
+  goog.implicitNamespaces_ = {};
 }
 goog.getObjectByName = function(name, opt_obj) {
   var parts = name.split(".");
@@ -117,14 +89,17 @@ goog.globalize = function(obj, opt_global) {
     global[x] = obj[x];
   }
 };
-goog.addDependency = function(relPath, provides, requires, opt_isModule) {
+goog.addDependency = function(relPath, provides, requires) {
   if (goog.DEPENDENCIES_ENABLED) {
     var provide, require;
     var path = relPath.replace(/\\/g, "/");
     var deps = goog.dependencies_;
     for (var i = 0;provide = provides[i];i++) {
       deps.nameToPath[provide] = path;
-      deps.pathIsModule[path] = !!opt_isModule;
+      if (!(path in deps.pathToNames)) {
+        deps.pathToNames[path] = {};
+      }
+      deps.pathToNames[path][provide] = true;
     }
     for (var j = 0;require = requires[j];j++) {
       if (!(path in deps.requires)) {
@@ -135,30 +110,23 @@ goog.addDependency = function(relPath, provides, requires, opt_isModule) {
   }
 };
 goog.define("goog.ENABLE_DEBUG_LOADER", true);
-goog.logToConsole_ = function(msg) {
-  if (goog.global.console) {
-    goog.global.console["error"](msg);
-  }
-};
 goog.require = function(name) {
   if (!COMPILED) {
     if (goog.isProvided_(name)) {
-      if (goog.isInModuleLoader_()) {
-        return name in goog.loadedModules_ ? goog.loadedModules_[name] : goog.getObjectByName(name);
-      } else {
-        return null;
-      }
+      return;
     }
     if (goog.ENABLE_DEBUG_LOADER) {
       var path = goog.getPathFromDeps_(name);
       if (path) {
         goog.included_[path] = true;
         goog.writeScripts_();
-        return null;
+        return;
       }
     }
     var errorMessage = "goog.require could not find: " + name;
-    goog.logToConsole_(errorMessage);
+    if (goog.global.console) {
+      goog.global.console["error"](errorMessage);
+    }
     throw Error(errorMessage);
   }
 };
@@ -186,12 +154,10 @@ goog.addSingletonGetter = function(ctor) {
   };
 };
 goog.instantiatedSingletons_ = [];
-goog.define("goog.LOAD_MODULE_USING_EVAL", true);
-goog.loadedModules_ = {};
 goog.DEPENDENCIES_ENABLED = !COMPILED && goog.ENABLE_DEBUG_LOADER;
 if (goog.DEPENDENCIES_ENABLED) {
   goog.included_ = {};
-  goog.dependencies_ = {pathIsModule:{}, nameToPath:{}, requires:{}, visited:{}, written:{}};
+  goog.dependencies_ = {pathToNames:{}, nameToPath:{}, requires:{}, visited:{}, written:{}};
   goog.inHtmlDocument_ = function() {
     var doc = goog.global.document;
     return typeof doc != "undefined" && "write" in doc;
@@ -217,99 +183,13 @@ if (goog.DEPENDENCIES_ENABLED) {
       }
     }
   };
-  goog.importScript_ = function(src, opt_sourceText) {
+  goog.importScript_ = function(src) {
     var importScript = goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_;
-    if (importScript(src, opt_sourceText)) {
+    if (!goog.dependencies_.written[src] && importScript(src)) {
       goog.dependencies_.written[src] = true;
     }
   };
-  goog.IS_OLD_IE_ = goog.global.document && (goog.global.document.all && !goog.global.atob);
-  goog.importModule_ = function(src) {
-    var bootstrap = 'goog.retrieveAndExecModule_("' + src + '");';
-    if (goog.importScript_("", bootstrap)) {
-      goog.dependencies_.written[src] = true;
-    }
-  };
-  goog.queuedModules_ = [];
-  goog.retrieveAndExecModule_ = function(src) {
-    var importScript = goog.global.CLOSURE_IMPORT_SCRIPT || goog.writeScriptTag_;
-    var scriptText = null;
-    var xhr = new goog.global["XMLHttpRequest"];
-    xhr.onload = function() {
-      scriptText = this.responseText;
-    };
-    xhr.open("get", src, false);
-    xhr.send();
-    scriptText = xhr.responseText;
-    if (scriptText != null) {
-      var execModuleScript = goog.wrapModule_(src, scriptText);
-      var isOldIE = goog.IS_OLD_IE_;
-      if (isOldIE) {
-        goog.queuedModules_.push(execModuleScript);
-      } else {
-        importScript(src, execModuleScript);
-      }
-      goog.dependencies_.written[src] = true;
-    } else {
-      throw new Error("load of " + src + "failed");
-    }
-  };
-  goog.wrapModule_ = function(srcUrl, scriptText) {
-    if (!goog.LOAD_MODULE_USING_EVAL || !goog.isDef(goog.global.JSON)) {
-      return "" + "goog.loadModule(function(exports) {" + '"use strict";' + scriptText + "\n" + ";return exports" + "});" + "\n//# sourceURL=" + srcUrl + "\n";
-    } else {
-      return "" + "goog.loadModule(" + goog.global.JSON.stringify(scriptText + "\n//# sourceURL=" + srcUrl + "\n") + ");";
-    }
-  };
-  goog.loadQueuedModules_ = function() {
-    var count = goog.queuedModules_.length;
-    if (count > 0) {
-      var queue = goog.queuedModules_;
-      goog.queuedModules_ = [];
-      for (var i = 0;i < count;i++) {
-        var entry = queue[i];
-        goog.globalEval(entry);
-      }
-    }
-  };
-  goog.loadModule = function(moduleDef) {
-    try {
-      goog.moduleLoaderState_ = {moduleName:undefined, declareTestMethods:false};
-      var exports;
-      if (goog.isFunction(moduleDef)) {
-        exports = moduleDef.call(goog.global, {});
-      } else {
-        if (goog.isString(moduleDef)) {
-          exports = goog.loadModuleFromSource_.call(goog.global, moduleDef);
-        } else {
-          throw Error("Invalid module definition");
-        }
-      }
-      if (Object.seal) {
-        Object.seal(exports);
-      }
-      var moduleName = goog.moduleLoaderState_.moduleName;
-      if (!goog.isString(moduleName) || !moduleName) {
-        throw Error('Invalid module name "' + moduleName + '"');
-      }
-      goog.loadedModules_[moduleName] = exports;
-      if (goog.moduleLoaderState_.declareTestMethods) {
-        for (var entry in exports) {
-          if (entry.indexOf("test", 0) === 0 || (entry == "tearDown" || entry == "setup")) {
-            goog.global[entry] = exports[entry];
-          }
-        }
-      }
-    } finally {
-      goog.moduleLoaderState_ = null;
-    }
-  };
-  goog.loadModuleFromSource_ = function() {
-    var exports = {};
-    eval(arguments[0]);
-    return exports;
-  };
-  goog.writeScriptTag_ = function(src, opt_sourceText) {
+  goog.writeScriptTag_ = function(src) {
     if (goog.inHtmlDocument_()) {
       var doc = goog.global.document;
       if (doc.readyState == "complete") {
@@ -320,28 +200,11 @@ if (goog.DEPENDENCIES_ENABLED) {
           throw Error('Cannot write "' + src + '" after document load');
         }
       }
-      var isOldIE = goog.IS_OLD_IE_;
-      if (opt_sourceText === undefined) {
-        if (!isOldIE) {
-          doc.write('<script type="text/javascript" src="' + src + '"></' + "script>");
-        } else {
-          var state = " onreadystatechange='goog.onScriptLoad_(this, " + ++goog.lastNonModuleScriptIndex_ + ")' ";
-          doc.write('<script type="text/javascript" src="' + src + '"' + state + "></" + "script>");
-        }
-      } else {
-        doc.write('<script type="text/javascript">' + opt_sourceText + "</" + "script>");
-      }
+      doc.write('<script type="text/javascript" src="' + src + '"></' + "script>");
       return true;
     } else {
       return false;
     }
-  };
-  goog.lastNonModuleScriptIndex_ = 0;
-  goog.onScriptLoad_ = function(script, scriptIndex) {
-    if (script.readyState == "complete" && goog.lastNonModuleScriptIndex_ == scriptIndex) {
-      goog.loadQueuedModules_();
-    }
-    return true;
   };
   goog.writeScripts_ = function() {
     var scripts = [];
@@ -381,27 +244,12 @@ if (goog.DEPENDENCIES_ENABLED) {
       }
     }
     for (var i = 0;i < scripts.length;i++) {
-      var path = scripts[i];
-      goog.dependencies_.written[path] = true;
-    }
-    var moduleState = goog.moduleLoaderState_;
-    goog.moduleLoaderState_ = null;
-    var loadingModule = false;
-    for (var i = 0;i < scripts.length;i++) {
-      var path = scripts[i];
-      if (path) {
-        if (!deps.pathIsModule[path]) {
-          goog.importScript_(goog.basePath + path);
-        } else {
-          loadingModule = true;
-          goog.importModule_(goog.basePath + path);
-        }
+      if (scripts[i]) {
+        goog.importScript_(goog.basePath + scripts[i]);
       } else {
-        goog.moduleLoaderState_ = moduleState;
         throw Error("Undefined script input");
       }
     }
-    goog.moduleLoaderState_ = moduleState;
   };
   goog.getPathFromDeps_ = function(rule) {
     if (rule in goog.dependencies_.nameToPath) {
@@ -715,7 +563,6 @@ goog.defineClass.createSealingConstructor_ = function(ctr, superClass) {
     }
     var wrappedCtr = function() {
       var instance = ctr.apply(this, arguments) || this;
-      instance[goog.UID_PROPERTY_] = instance[goog.UID_PROPERTY_];
       if (this.constructor === wrappedCtr) {
         Object.seal(instance);
       }
@@ -1109,6 +956,13 @@ goog.string.escapeChar = function(c) {
     rv += cc.toString(16).toUpperCase();
   }
   return goog.string.jsEscapeCache_[c] = rv;
+};
+goog.string.toMap = function(s) {
+  var rv = {};
+  for (var i = 0;i < s.length;i++) {
+    rv[s.charAt(i)] = true;
+  }
+  return rv;
 };
 goog.string.contains = function(str, subString) {
   return str.indexOf(subString) != -1;
@@ -1601,17 +1455,6 @@ goog.array.removeIf = function(arr, f, opt_obj) {
   }
   return false;
 };
-goog.array.removeAllIf = function(arr, f, opt_obj) {
-  var removedCount = 0;
-  goog.array.forEachRight(arr, function(val, index) {
-    if (f.call(opt_obj, val, index, arr)) {
-      if (goog.array.removeAt(arr, index)) {
-        removedCount++;
-      }
-    }
-  });
-  return removedCount;
-};
 goog.array.concat = function(var_args) {
   return goog.array.ARRAY_PROTOTYPE_.concat.apply(goog.array.ARRAY_PROTOTYPE_, arguments);
 };
@@ -2042,118 +1885,16 @@ globeGeometry.math.toFixed = function(num, precision) {
   big = Math.abs(num) * zeros;
   return goog.math.sign(num) * goog.math.safeFloor(big) / zeros;
 };
-goog.provide("globeGeometry.LatLng");
-goog.require("globeGeometry.math");
-goog.require("goog.math");
-globeGeometry.LatLng = function(lat, lng) {
-  this.lat = goog.math.clamp(Number(lat), -90, 90);
-  this.lng = goog.math.clamp(Number(lng), -180, 180);
-};
-globeGeometry.LatLng.prototype.PRECISION = 9;
-globeGeometry.LatLng.prototype.getLat = function() {
-  return this.lat;
-};
-globeGeometry.LatLng.prototype.getLng = function() {
-  return this.lng;
-};
-globeGeometry.LatLng.prototype.toString = function() {
-  return "(" + this.lat + ", " + this.lng + ")";
-};
-globeGeometry.LatLng.prototype.toUrlValue = function(precision) {
-  var lat, lng;
+globeGeometry.math.round = function(num, precision) {
+  var pow;
   if (precision == null) {
-    precision = 6;
+    precision = 0;
   }
-  lat = globeGeometry.math.toFixed(this.getLat(), precision);
-  lng = globeGeometry.math.toFixed(this.getLng(), precision);
-  return Number(lat) + "," + Number(lng);
-};
-globeGeometry.LatLng.prototype.equals = function(other) {
-  return goog.math.nearlyEquals(this.getLat(), other.getLat()) && goog.math.nearlyEquals(this.getLng(), other.getLng());
-};
-goog.provide("globeGeometry.encoding");
-goog.require("globeGeometry.LatLng");
-globeGeometry.encoding = function() {
-};
-globeGeometry.encoding.encodePath = function(path) {
-  var encoded, latOffset, lngOffset, point, prev, _i, _len;
-  encoded = "";
-  prev = new globeGeometry.LatLng(0, 0);
-  for (_i = 0, _len = path.length;_i < _len;_i++) {
-    point = path[_i];
-    latOffset = point.getLat() - prev.getLat();
-    lngOffset = point.getLng() - prev.getLng();
-    encoded += globeGeometry.encoding.encodeSignedNumber(latOffset);
-    encoded += globeGeometry.encoding.encodeSignedNumber(lngOffset);
-    prev = point;
+  if (precision === 0) {
+    return Math.round(num);
   }
-  return encoded;
-};
-globeGeometry.encoding.decodePath = function(path) {
-  var i, lat, lng, num, nums, points, _i, _len;
-  nums = globeGeometry.encoding.decodeSignedNumbers(path);
-  lat = lng = 0;
-  points = [];
-  for (i = _i = 0, _len = nums.length;_i < _len;i = ++_i) {
-    num = nums[i];
-    if (i % 2 === 0) {
-      lat += num;
-    }
-    if (i % 2 === 1) {
-      lng += num;
-    }
-    if (i > 0 && i % 2 === 1) {
-      points.push(new globeGeometry.LatLng(lat, lng));
-    }
-  }
-  return points;
-};
-globeGeometry.encoding.encodeUnsignedNumber = function(value) {
-  var encoded;
-  encoded = "";
-  while (value >= 32) {
-    encoded += String.fromCharCode((32 | value & 31) + 63);
-    value >>= 5;
-  }
-  encoded += String.fromCharCode(value + 63);
-  return encoded;
-};
-globeGeometry.encoding.encodeSignedNumber = function(value) {
-  var num;
-  value = Math.round(value * 1E5);
-  num = value << 1;
-  if (value < 0) {
-    num = ~num;
-  }
-  return globeGeometry.encoding.encodeUnsignedNumber(num);
-};
-globeGeometry.encoding.decodeUnsignedNumbers = function(encoded) {
-  var b, index, num, nums, shift;
-  index = 0;
-  nums = [];
-  while (index < encoded.length) {
-    num = shift = 0;
-    while (true) {
-      b = encoded.charCodeAt(index++) - 63;
-      num |= (b & 31) << shift;
-      shift += 5;
-      if (!(b >= 32)) {
-        break;
-      }
-    }
-    nums.push(num);
-  }
-  return nums;
-};
-globeGeometry.encoding.decodeSignedNumbers = function(encoded) {
-  var i, num, nums, _i, _len;
-  nums = globeGeometry.encoding.decodeUnsignedNumbers(encoded);
-  for (i = _i = 0, _len = nums.length;_i < _len;i = ++_i) {
-    num = nums[i];
-    num = num & 1 ? ~(num >> 1) : num >> 1;
-    nums[i] = num / 1E5;
-  }
-  return nums;
+  pow = Math.pow(10, precision);
+  return Math.round(num * pow) / pow;
 };
 goog.provide("globeGeometry.latLng.parser");
 goog.require("goog.array");
@@ -2263,12 +2004,16 @@ globeGeometry.latLng.parser.prototype.getNumericParts = function(str, count) {
     return goog.string.toNumber(num);
   });
 };
-goog.provide("globeGeometry.latLng.factory");
+goog.provide("globeGeometry.LatLng");
 goog.require("globeGeometry.latLng.parser");
-goog.require("globeGeometry.LatLng");
-globeGeometry.latLng.factory = function() {
+goog.require("globeGeometry.math");
+goog.require("goog.math");
+globeGeometry.LatLng = function(lat, lng) {
+  this.lat = goog.math.clamp(Number(lat), -90, 90);
+  this.lng = goog.math.clamp(Number(lng), -180, 180);
 };
-globeGeometry.latLng.factory.createInstance = function(input) {
+globeGeometry.LatLng.prototype.PRECISION = 9;
+globeGeometry.LatLng.createInstance = function(input) {
   var latLng, parser;
   parser = new globeGeometry.latLng.parser;
   latLng = parser.parseDms(input);
@@ -2282,6 +2027,163 @@ globeGeometry.latLng.factory.createInstance = function(input) {
     throw Error("Invalid input");
   }
   return new globeGeometry.LatLng(latLng[0], latLng[1]);
+};
+globeGeometry.LatLng.prototype.getLat = function() {
+  return this.lat;
+};
+globeGeometry.LatLng.prototype.getLng = function() {
+  return this.lng;
+};
+globeGeometry.LatLng.prototype.toString = function() {
+  return "(" + this.lat + ", " + this.lng + ")";
+};
+globeGeometry.LatLng.prototype.toUrlValue = function(precision) {
+  var lat, lng;
+  if (precision == null) {
+    precision = 6;
+  }
+  lat = globeGeometry.math.toFixed(this.getLat(), precision);
+  lng = globeGeometry.math.toFixed(this.getLng(), precision);
+  return Number(lat) + "," + Number(lng);
+};
+globeGeometry.LatLng.prototype.toDd = function(separator, precision) {
+  var lat, latLetter, lng, lngLetter;
+  if (separator == null) {
+    separator = " ";
+  }
+  if (precision == null) {
+    precision = 6;
+  }
+  lat = globeGeometry.math.toFixed(Math.abs(this.getLat()), precision);
+  lng = globeGeometry.math.toFixed(Math.abs(this.getLng()), precision);
+  latLetter = this.getLat() < 0 ? "S" : "N";
+  lngLetter = this.getLng() < 0 ? "E" : "W";
+  return lat + "\u00b0" + latLetter + separator + lng + "\u00b0" + lngLetter;
+};
+globeGeometry.LatLng.prototype.toDdm = function(separator, precision) {
+  var dLat, dLng, lat, latLetter, lng, lngLetter, mLat, mLng;
+  if (separator == null) {
+    separator = " ";
+  }
+  if (precision == null) {
+    precision = 3;
+  }
+  lat = Math.abs(this.getLat());
+  lng = Math.abs(this.getLng());
+  dLat = globeGeometry.math.toFixed(lat, 0);
+  dLng = globeGeometry.math.toFixed(lng, 0);
+  mLat = globeGeometry.math.round((lat - dLat) * 60, precision);
+  mLng = globeGeometry.math.round((lng - dLng) * 60, precision);
+  latLetter = this.getLat() < 0 ? "S" : "N";
+  lngLetter = this.getLng() < 0 ? "E" : "W";
+  return dLat + "\u00b0" + mLat + "'" + latLetter + separator + dLng + "\u00b0" + mLng + "'" + lngLetter;
+};
+globeGeometry.LatLng.prototype.toDms = function(separator, precision) {
+  var dLat, dLng, lat, latLetter, lng, lngLetter, mLat, mLng, sLat, sLng;
+  if (separator == null) {
+    separator = " ";
+  }
+  if (precision == null) {
+    precision = 1;
+  }
+  lat = Math.abs(this.getLat());
+  lng = Math.abs(this.getLng());
+  dLat = globeGeometry.math.toFixed(lat, 0);
+  dLng = globeGeometry.math.toFixed(lng, 0);
+  mLat = globeGeometry.math.toFixed((lat - dLat) * 60, 0);
+  mLng = globeGeometry.math.toFixed((lng - dLng) * 60, 0);
+  sLat = globeGeometry.math.round((lat - dLat - mLat / 60) * 3600, precision);
+  sLng = globeGeometry.math.round((lng - dLng - mLng / 60) * 3600, precision);
+  latLetter = this.getLat() < 0 ? "S" : "N";
+  lngLetter = this.getLng() < 0 ? "E" : "W";
+  return dLat + "\u00b0" + mLat + "'" + sLat + '"' + latLetter + separator + dLng + "\u00b0" + mLng + "'" + sLng + '"' + lngLetter;
+};
+globeGeometry.LatLng.prototype.equals = function(other) {
+  return goog.math.nearlyEquals(this.getLat(), other.getLat()) && goog.math.nearlyEquals(this.getLng(), other.getLng());
+};
+goog.provide("globeGeometry.encoding");
+goog.require("globeGeometry.LatLng");
+globeGeometry.encoding = function() {
+};
+globeGeometry.encoding.encodePath = function(path) {
+  var encoded, latOffset, lngOffset, point, prev, _i, _len;
+  encoded = "";
+  prev = new globeGeometry.LatLng(0, 0);
+  for (_i = 0, _len = path.length;_i < _len;_i++) {
+    point = path[_i];
+    latOffset = point.getLat() - prev.getLat();
+    lngOffset = point.getLng() - prev.getLng();
+    encoded += globeGeometry.encoding.encodeSignedNumber(latOffset);
+    encoded += globeGeometry.encoding.encodeSignedNumber(lngOffset);
+    prev = point;
+  }
+  return encoded;
+};
+globeGeometry.encoding.decodePath = function(path) {
+  var i, lat, lng, num, nums, points, _i, _len;
+  nums = globeGeometry.encoding.decodeSignedNumbers(path);
+  lat = lng = 0;
+  points = [];
+  for (i = _i = 0, _len = nums.length;_i < _len;i = ++_i) {
+    num = nums[i];
+    if (i % 2 === 0) {
+      lat += num;
+    }
+    if (i % 2 === 1) {
+      lng += num;
+    }
+    if (i > 0 && i % 2 === 1) {
+      points.push(new globeGeometry.LatLng(lat, lng));
+    }
+  }
+  return points;
+};
+globeGeometry.encoding.encodeUnsignedNumber = function(value) {
+  var encoded;
+  encoded = "";
+  while (value >= 32) {
+    encoded += String.fromCharCode((32 | value & 31) + 63);
+    value >>= 5;
+  }
+  encoded += String.fromCharCode(value + 63);
+  return encoded;
+};
+globeGeometry.encoding.encodeSignedNumber = function(value) {
+  var num;
+  value = Math.round(value * 1E5);
+  num = value << 1;
+  if (value < 0) {
+    num = ~num;
+  }
+  return globeGeometry.encoding.encodeUnsignedNumber(num);
+};
+globeGeometry.encoding.decodeUnsignedNumbers = function(encoded) {
+  var b, index, num, nums, shift;
+  index = 0;
+  nums = [];
+  while (index < encoded.length) {
+    num = shift = 0;
+    while (true) {
+      b = encoded.charCodeAt(index++) - 63;
+      num |= (b & 31) << shift;
+      shift += 5;
+      if (!(b >= 32)) {
+        break;
+      }
+    }
+    nums.push(num);
+  }
+  return nums;
+};
+globeGeometry.encoding.decodeSignedNumbers = function(encoded) {
+  var i, num, nums, _i, _len;
+  nums = globeGeometry.encoding.decodeUnsignedNumbers(encoded);
+  for (i = _i = 0, _len = nums.length;_i < _len;i = ++_i) {
+    num = nums[i];
+    num = num & 1 ? ~(num >> 1) : num >> 1;
+    nums[i] = num / 1E5;
+  }
+  return nums;
 };
 goog.provide("globeGeometry.spherical");
 goog.require("goog.math");
