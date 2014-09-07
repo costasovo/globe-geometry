@@ -23,10 +23,10 @@ Written in CoffeeScript and powered by http://github.com/steida/este-library
   Different input formats support:
 
   ```javascript
-  var latLng = globeGeometry.latLng.createInstance("41°23'41.2\"N 2°08'55.6\"E");
-  var latLng = globeGeometry.latLng.createInstance("41°23'41.2\", 2°08'55.6\"");
-  var latLng = globeGeometry.latLng.createInstance("41° 23.68666', 2° 8.9266667'");
-  var latLng = globeGeometry.latLng.createInstance("41.39477777°N, 2.1487777778°E");
+  var latLng = globeGeometry.LatLng.createInstance("41°23'41.2\"N 2°08'55.6\"E");
+  var latLng = globeGeometry.LatLng.createInstance("41°23'41.2\", 2°08'55.6\"");
+  var latLng = globeGeometry.LatLng.createInstance("41° 23.68666', 2° 8.9266667'");
+  var latLng = globeGeometry.LatLng.createInstance("41.39477777°N, 2.1487777778°E");
   ```
 
   Encoding:
