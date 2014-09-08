@@ -40,22 +40,27 @@
 
     <div class="container">
 
-	<h1 class="page-header">Globe geometry demo</h1>
-	<p class="lead">
-		Google Closure spatial geometry library. Calculate distance and heading between points on globe. Encode and decode polylines. Main input formats for points are supported. <a href="https://github.com/michalsanger/globe-geometry">Source code on Github</a>
-	</p>
+  <h1 class="page-header">Globe geometry demo</h1>
+  <p class="lead">
+    Google Closure spatial geometry library. Calculate distance and heading between points on globe. Encode and decode polylines. Main input formats for points are supported. <a href="https://github.com/michalsanger/globe-geometry">Source code on Github</a>
+  </p>
 
-	<h1 id="converter" class="page-header">Converter</h1>
-	<p class="lead">Convert DMS, DDM or DD into LatLng.</p>
-	<form class="form-inline" role="form" id="converter-form">
-	<div class="form-group">
-		<input class="form-control input-lg src" type="text" placeholder="eg 41°23'41.2&quot;N 2°08'55.6&quot;E" value="41°23'41.2&quot;N 2°08'55.6&quot;E">
-		<button type="button" class="btn btn-primary btn-lg">&gt;&gt;</button>
-		<input class="form-control input-lg result" type="text">
-	</div>
-	</form>
+  <h1 id="converter" class="page-header">Converter</h1>
+  <p class="lead">Convert from DMS, DDM, DD or LatLng format.</p>
+  <form class="form-inline" role="form" id="converter-form">
+    <div class="form-group">
+      <input class="form-control input-lg src" type="text" placeholder="eg 41°23'41.2&quot;N 2°08'55.6&quot;E" value="41°23'41.2&quot;N 2°08'55.6&quot;E">
+      <button type="button" class="btn btn-primary btn-lg">Convert</button>
+    </div>
+  </form>
+  <table id="converter-results" class="table">
+    <tr class="dms"><td>DMS:</td><td>&nbsp;</td></tr>
+    <tr class="ddm"><td>DDM:</td><td>&nbsp;</td></tr>
+    <tr class="dd"><td>DD:</td><td>&nbsp;</td></tr>
+    <tr class="gps"><td>GPS:</td><td>&nbsp;</td></tr>
+  </table>
 
-    </div><!-- /.container -->
+  </div><!-- /.container -->
 
 
     <script src="assets/jquery-2.1.0.min.js"></script>
@@ -63,11 +68,16 @@
     <script src="dist/globeGeometry.min.js"></script>
     <script type="text/javascript">
     $(document).ready(function(){
-    	$("#converter-form button").on("click", function(event) {
-			var input = $(this).prev().val();
-			var latLng = globeGeometry.LatLng.createInstance(input);
-			$(this).next().val(latLng.toUrlValue()).focus();
-		});
+      $("#converter-results").hide();
+      $("#converter-form button").on("click", function(event) {
+        $("#converter-results").show(500);
+        var input = $(this).prev().val();
+        var latLng = globeGeometry.LatLng.createInstance(input);
+        $("#converter-results tr.dms td:nth-child(2)").text(latLng.toDms());
+        $("#converter-results tr.ddm td:nth-child(2)").text(latLng.toDdm());
+        $("#converter-results tr.dd td:nth-child(2)").text(latLng.toDd());
+        $("#converter-results tr.gps td:nth-child(2)").text(latLng.toUrlValue());
+      });
     });
     </script>
   </body>
