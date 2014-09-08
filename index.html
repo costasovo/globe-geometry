@@ -47,8 +47,9 @@
 
   <h1 id="converter" class="page-header">Converter</h1>
   <p class="lead">Convert from DMS, DDM, DD or LatLng format.</p>
-  <form class="form-inline" role="form" id="converter-form">
+  <form class="form" role="form" id="converter-form">
     <div class="form-group">
+      <label class="control-label"></label>
       <input class="form-control input-lg src" type="text" placeholder="eg 41°23'41.2&quot;N 2°08'55.6&quot;E" value="41°23'41.2&quot;N 2°08'55.6&quot;E">
       <button type="button" class="btn btn-primary btn-lg">Convert</button>
     </div>
@@ -70,13 +71,21 @@
     $(document).ready(function(){
       $("#converter-results").hide();
       $("#converter-form button").on("click", function(event) {
-        $("#converter-results").show(500);
-        var input = $(this).prev().val();
-        var latLng = globeGeometry.LatLng.createInstance(input);
-        $("#converter-results tr.dms td:nth-child(2)").text(latLng.toDms());
-        $("#converter-results tr.ddm td:nth-child(2)").text(latLng.toDdm());
-        $("#converter-results tr.dd td:nth-child(2)").text(latLng.toDd());
-        $("#converter-results tr.gps td:nth-child(2)").text(latLng.toUrlValue());
+        try {
+          var input = $(this).prev();
+          var latLng = globeGeometry.LatLng.createInstance(input.val());
+          input.parent().removeClass('has-error');
+          input.prev().text('');
+          $("#converter-results").show(500);
+          $("#converter-results tr.dms td:nth-child(2)").text(latLng.toDms());
+          $("#converter-results tr.ddm td:nth-child(2)").text(latLng.toDdm());
+          $("#converter-results tr.dd td:nth-child(2)").text(latLng.toDd());
+          $("#converter-results tr.gps td:nth-child(2)").text(latLng.toUrlValue());
+        } catch (e) {
+          $("#converter-results").hide();
+          input.parent().addClass('has-error');
+          input.prev().text(e.message);
+        }
       });
     });
     </script>
