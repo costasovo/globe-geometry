@@ -2320,6 +2320,31 @@ globeGeometry.quadKey.fromTileToQuadKey = function(tile, zoomLevel) {
   }
   return key;
 };
+globeGeometry.quadKey.fromQuadKeyToTile = function(key) {
+  var i, mask, x, y, zoomLevel, _i;
+  x = y = 0;
+  zoomLevel = key.length;
+  for (i = _i = zoomLevel;zoomLevel <= 1 ? _i <= 1 : _i >= 1;i = zoomLevel <= 1 ? ++_i : --_i) {
+    mask = 1 << i - 1;
+    switch(key[zoomLevel - i]) {
+      case "0":
+        break;
+      case "1":
+        x |= mask;
+        break;
+      case "2":
+        y |= mask;
+        break;
+      case "3":
+        x |= mask;
+        y |= mask;
+        break;
+      default:
+        throw new Error("Invalid QuadKey digit sequence.");;
+    }
+  }
+  return new goog.math.Coordinate(x, y);
+};
 goog.provide("globeGeometry.spherical");
 goog.require("goog.math");
 globeGeometry.spherical = function() {

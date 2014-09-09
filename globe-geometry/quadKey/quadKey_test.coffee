@@ -21,3 +21,10 @@ suite 'globeGeometry.quadKey', ->
       quadKey = QuadKey.fromTileToQuadKey tile, 3
 
       assert.equal quadKey, '213'
+
+  suite 'fromQuadKeyToTile', ->
+    test 'should work for 213', ->
+      tile = QuadKey.fromQuadKeyToTile '213'
+
+      assert.equal tile.x, 3
+      assert.equal tile.y, 5

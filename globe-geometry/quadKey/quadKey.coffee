@@ -35,3 +35,25 @@ class globeGeometry.quadKey
       digit += 2 if (tile.y & mask) != 0
       key += digit
     return key
+
+  ###*
+    @param {string} key
+    @return {goog.math.Coordinate}
+    @export
+    @see http://msdn.microsoft.com/en-us/library/bb259689.aspx
+  ###
+  @fromQuadKeyToTile: (key) ->
+    x = y = 0
+    zoomLevel = key.length
+    for i in [zoomLevel..1]
+      mask = 1 << (i - 1)
+      switch key[zoomLevel - i]
+        when '0' then break
+        when '1' then x |= mask
+        when '2' then y |= mask
+        when '3'
+          x |= mask
+          y |= mask
+        else throw new Error 'Invalid QuadKey digit sequence.'
+    return new goog.math.Coordinate x, y
+
