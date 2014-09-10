@@ -17,28 +17,27 @@ class globeGeometry.quadKey
   ###
   @fromLatLngToQuadKey: (latLng, zoomLevel) ->
     tile = globeGeometry.mercator.fromLatLngToTile latLng, zoomLevel
-    return globeGeometry.quadKey.fromTileToQuadKey tile, zoomLevel
+    return globeGeometry.quadKey.fromTileToQuadKey tile
 
   ###*
-    @param {goog.math.Coordinate} tile
-    @param {number} zoomLevel
+    @param {globeGeometry.mercator.Tile} tile
     @return {string}
     @export
     @see http://msdn.microsoft.com/en-us/library/bb259689.aspx
   ###
-  @fromTileToQuadKey: (tile, zoomLevel) ->
+  @fromTileToQuadKey: (tile) ->
     key = ''
-    for i in [zoomLevel..1]
+    for i in [tile.getZ()..1]
       digit = 0
       mask = 1 << (i - 1)
-      digit += 1 if (tile.x & mask) != 0
-      digit += 2 if (tile.y & mask) != 0
+      digit += 1 if (tile.getX() & mask) != 0
+      digit += 2 if (tile.getY() & mask) != 0
       key += digit
     return key
 
   ###*
     @param {string} key
-    @return {goog.math.Coordinate}
+    @return {globeGeometry.mercator.Tile}
     @export
     @see http://msdn.microsoft.com/en-us/library/bb259689.aspx
   ###
@@ -55,5 +54,5 @@ class globeGeometry.quadKey
           x |= mask
           y |= mask
         else throw new Error 'Invalid QuadKey digit sequence.'
-    return new goog.math.Coordinate x, y
+    return new globeGeometry.mercator.Tile x, y, zoomLevel
 

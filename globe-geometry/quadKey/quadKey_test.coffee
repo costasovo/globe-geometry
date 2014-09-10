@@ -1,5 +1,4 @@
 goog.require 'globeGeometry.LatLng'
-goog.require 'goog.math.Coordinate'
 
 suite 'globeGeometry.quadKey', ->
 
@@ -16,9 +15,9 @@ suite 'globeGeometry.quadKey', ->
 
   suite 'fromTileToQuadKey', ->
     test 'should work for 3,5', ->
-      tile = new goog.math.Coordinate 3, 5
+      tile = new globeGeometry.mercator.Tile 3, 5, 3
 
-      quadKey = QuadKey.fromTileToQuadKey tile, 3
+      quadKey = QuadKey.fromTileToQuadKey tile
 
       assert.equal quadKey, '213'
 
