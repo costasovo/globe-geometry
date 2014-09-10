@@ -1,6 +1,6 @@
 {
   "name": "globe-geometry",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Spatial geometry library",
   "author": "Michal Sänger <michal.sanger@gmail.com>",
   "private": true,
