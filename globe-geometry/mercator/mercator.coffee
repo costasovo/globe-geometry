@@ -4,7 +4,7 @@
 
 goog.provide 'globeGeometry.mercator'
 
-goog.require 'goog.math.Coordinate'
+goog.require 'globeGeometry.Point'
 
 class globeGeometry.mercator
 
@@ -17,7 +17,7 @@ class globeGeometry.mercator
   ###*
     @param {globeGeometry.LatLng} latLng
     @param {number} zoomLevel
-    @return {goog.math.Coordinate}
+    @return {globeGeometry.Point}
     @export
     @see http://msdn.microsoft.com/en-us/library/bb259689.aspx
   ###
@@ -26,7 +26,7 @@ class globeGeometry.mercator
     sinLat = Math.sin latLng.getLat() * Math.PI/180
     x = ((latLng.getLng() + 180) / 360) * canvasSize
     y = (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * canvasSize
-    return new goog.math.Coordinate x, y
+    return new globeGeometry.Point x, y
 
   ###*
     @param {globeGeometry.LatLng} latLng
@@ -37,6 +37,6 @@ class globeGeometry.mercator
   ###
   @fromLatLngToTile: (latLng, zoomLevel) ->
     point = globeGeometry.mercator.fromLatLngToPoint latLng, zoomLevel
-    x = Math.floor point.x / globeGeometry.mercator.TILE_SIZE
-    y = Math.floor point.y / globeGeometry.mercator.TILE_SIZE
+    x = Math.floor point.getX() / globeGeometry.mercator.TILE_SIZE
+    y = Math.floor point.getY() / globeGeometry.mercator.TILE_SIZE
     return new globeGeometry.mercator.Tile x, y, zoomLevel
