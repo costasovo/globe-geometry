@@ -1,4 +1,5 @@
 goog.require 'globeGeometry.LatLng'
+goog.require 'globeGeometry.mercator.Tile'
 
 suite 'globeGeometry.quadKey', ->
 

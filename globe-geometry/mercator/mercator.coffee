@@ -4,7 +4,6 @@
 
 goog.provide 'globeGeometry.mercator'
 
-#goog.require 'globeGeometry.mercator.Tile'
 goog.require 'goog.math.Coordinate'
 
 class globeGeometry.mercator
