@@ -27,6 +27,15 @@ class globeGeometry.mercator.Tile
     @y = goog.math.clamp y, 0, max
 
   ###*
+    Factory for creating Tile instances from quadKey
+    @param {string} quadKey
+    @return {globeGeometry.mercator.Tile}
+    @export
+  ###
+  @createInstance: (quadKey) ->
+    return globeGeometry.quadKey.fromQuadKeyToTile quadKey
+
+  ###*
     @return {number}
     @export
   ###

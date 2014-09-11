@@ -32,3 +32,12 @@ suite 'globeGeometry.mercator.Tile', ->
       quadKey = tile.toQuadKey()
 
       assert.equal quadKey, '213'
+
+  suite 'createInstance', ->
+    test 'should work', ->
+      quadKey = '213'
+      expected = new Tile 3, 5, 3
+
+      tile = Tile.createInstance quadKey
+
+      assert.isTrue tile.equals expected
