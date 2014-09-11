@@ -137,3 +137,10 @@ suite 'globeGeometry.LatLng', ->
       latLng = new LatLng 49.208972, 16.598305
       dms = latLng.toDms()
       assert.equal dms, "49°12'32.3\"N 16°35'53.9\"W"
+
+  suite 'toQuadKey', ->
+    test 'should work', ->
+      latLng = new LatLng 32.306416, 122.614583
+      quadKey = latLng.toQuadKey(6)
+
+      assert.equal quadKey, "132103"

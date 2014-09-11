@@ -6,6 +6,8 @@ goog.provide 'globeGeometry.LatLng'
 
 goog.require 'globeGeometry.latLng.parser'
 goog.require 'globeGeometry.math'
+goog.require 'globeGeometry.mercator.Tile'
+goog.require 'globeGeometry.quadKey'
 goog.require 'goog.math'
 
 class globeGeometry.LatLng
@@ -120,6 +122,14 @@ class globeGeometry.LatLng
     latLetter = if @getLat() < 0 then 'S' else 'N'
     lngLetter = if @getLng() < 0 then 'E' else 'W'
     return dLat + '°' + mLat + "'" + sLat + '"' + latLetter + separator + dLng + '°' + mLng + "'" + sLng + '"' + lngLetter
+
+  ###*
+    @param {number} zoomLevel
+    @return {string}
+    @export
+  ###
+  toQuadKey: (zoomLevel) ->
+    return globeGeometry.quadKey.fromLatLngToQuadKey @, zoomLevel
 
   ###*
     @param {globeGeometry.LatLng} other
