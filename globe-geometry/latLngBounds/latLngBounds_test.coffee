@@ -32,3 +32,27 @@ suite 'globeGeometry.LatLngBounds', ->
       bounds = new LatLngBounds sw, ne
 
       assert.isFalse bounds.isEmpty(), "Semi defined bounds are not empty"
+
+  suite 'equals', ->
+    test 'should work with itself', ->
+      sw = new LatLng 3, -4
+      ne = new LatLng 10, 20
+      bounds = new LatLngBounds sw, ne
+
+      assert.isTrue bounds.equals(bounds), "Bounds is equal with itself"
+
+    test 'should work with both empty', ->
+      bounds = new LatLngBounds()
+      bounds2 = new LatLngBounds()
+
+      assert.isTrue bounds.equals(bounds2), "Empty bounds is equal with another empty bounds"
+
+    test 'should work with different', ->
+      sw = new LatLng 3, -4
+      ne = new LatLng 10, 20
+      bounds = new LatLngBounds sw, ne
+      sw2 = new LatLng 1, 2
+      ne2 = new LatLng 1.5, 45.7
+      bounds2 = new LatLngBounds sw2, ne2
+
+      assert.isFalse bounds.equals(bounds2), "Bounds is not equal with different bounds"

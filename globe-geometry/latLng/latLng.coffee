@@ -132,10 +132,11 @@ class globeGeometry.LatLng
     return globeGeometry.quadKey.fromLatLngToQuadKey @, zoomLevel
 
   ###*
-    @param {globeGeometry.LatLng} other
+    @param {globeGeometry.LatLng=} other
     @return {boolean}
     @export
   ###
   equals: (other) ->
+    return false if !goog.isDefAndNotNull other
     return goog.math.nearlyEquals(@getLat(), other.getLat()) && goog.math.nearlyEquals(@getLng(), other.getLng())
 

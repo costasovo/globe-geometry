@@ -35,3 +35,15 @@ class globeGeometry.LatLngBounds
   ###
   isEmpty: () ->
     return !goog.isDefAndNotNull(@sw) && !goog.isDefAndNotNull(@ne)
+
+  ###*
+    @param {globeGeometry.LatLngBounds} bounds
+    @return {boolean}
+    @export
+  ###
+  equals: (bounds) ->
+    return true if @isEmpty() && bounds.isEmpty()
+    sw = bounds.getSouthWest()
+    ne = bounds.getNorthEast()
+    return true if @sw.equals(sw) && !goog.isDefAndNotNull(ne) && !goog.isDefAndNotNull(@ne)
+    return sw.equals(@sw) && ne.equals(@ne)
