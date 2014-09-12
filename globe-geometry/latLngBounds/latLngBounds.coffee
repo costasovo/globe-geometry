@@ -19,10 +19,19 @@ class globeGeometry.LatLngBounds
 
   ###*
     @return {globeGeometry.LatLng | undefined}
+    @export
   ###
   getNorthEast: () -> @ne
 
   ###*
     @return {globeGeometry.LatLng | undefined}
+    @export
   ###
   getSouthWest: () -> @sw
+
+  ###*
+    @return {boolean}
+    @export
+  ###
+  isEmpty: () ->
+    return !goog.isDefAndNotNull(@sw) && !goog.isDefAndNotNull(@ne)
