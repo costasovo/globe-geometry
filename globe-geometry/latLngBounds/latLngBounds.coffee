@@ -47,3 +47,19 @@ class globeGeometry.LatLngBounds
     ne = bounds.getNorthEast()
     return true if @sw.equals(sw) && !goog.isDefAndNotNull(ne) && !goog.isDefAndNotNull(@ne)
     return sw.equals(@sw) && ne.equals(@ne)
+
+  ###*
+    @return {boolean}
+    @private
+  ###
+  crossesMeridian: () ->
+    return false if @isEmpty()
+    return true if (@sw.getLng() == 180) || (@sw.getLng() == -180) # semi defined on meridian
+    return false
+
+  ###*
+    @return {boolean}
+    @private
+  ###
+  isEDef: () ->
+    return goog.isDefAndNotNull(@sw) && goog.isDefAndNotNull(@ne)

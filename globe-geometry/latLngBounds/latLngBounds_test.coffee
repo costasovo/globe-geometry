@@ -56,3 +56,21 @@ suite 'globeGeometry.LatLngBounds', ->
       bounds2 = new LatLngBounds sw2, ne2
 
       assert.isFalse bounds.equals(bounds2), "Bounds is not equal with different bounds"
+
+  suite 'crossesMeridian', ->
+    test 'should work with empty', ->
+      bounds = new LatLngBounds()
+
+      assert.isFalse bounds.crossesMeridian(), "Empty bounds does not cross meridian"
+
+    test 'should work with semi defined', ->
+      bounds = new LatLngBounds new LatLng 3, 4
+
+      assert.isFalse bounds.crossesMeridian(), "Semi defined bounds does not cross meridian"
+
+    test 'should work with semi defined on meridian', ->
+      bounds = new LatLngBounds new LatLng 4, 180
+      bounds2 = new LatLngBounds new LatLng 4, -180
+
+      assert.isTrue bounds.crossesMeridian(), "(4, 180) does cross meridian"
+      assert.isTrue bounds2.crossesMeridian(), "(4, -180) does cross meridian"
