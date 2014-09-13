@@ -4,7 +4,7 @@
 
 goog.provide 'globeGeometry.LatLng'
 
-goog.require 'globeGeometry.latLng.parser'
+goog.require 'globeGeometry.latLng.Parser'
 goog.require 'globeGeometry.math'
 goog.require 'globeGeometry.mercator.Tile'
 goog.require 'globeGeometry.quadKey'
@@ -36,7 +36,7 @@ class globeGeometry.LatLng
     @export
   ###
   @createInstance: (input) ->
-    parser = new globeGeometry.latLng.parser()
+    parser = new globeGeometry.latLng.Parser()
     latLng = parser.parseDms input
     latLng = parser.parseDdm input if !goog.isArray latLng
     latLng = parser.parseDd input if !goog.isArray latLng

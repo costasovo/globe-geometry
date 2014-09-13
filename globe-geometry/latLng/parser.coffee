@@ -2,12 +2,12 @@
   @fileoverview Various input LatLng format parser
 ###
 
-goog.provide 'globeGeometry.latLng.parser'
+goog.provide 'globeGeometry.latLng.Parser'
 
 goog.require 'goog.array'
 goog.require 'globeGeometry.math'
 
-class globeGeometry.latLng.parser
+class globeGeometry.latLng.Parser
 
   ###*
     @constructor

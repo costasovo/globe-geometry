@@ -1,6 +1,6 @@
-suite 'globeGeometry.latLng.parser', ->
+suite 'globeGeometry.latLng.Parser', ->
 
-  Parser = new globeGeometry.latLng.parser()
+  Parser = new globeGeometry.latLng.Parser()
 
   suite 'parseDms', ->
     test 'should work with various input formats', ->
