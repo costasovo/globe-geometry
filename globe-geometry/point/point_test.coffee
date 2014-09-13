@@ -5,7 +5,7 @@ suite 'globeGeometry.Point', ->
   Point = globeGeometry.Point
 
   suite 'constructor', ->
-    test 'should worj', ->
+    test 'should work', ->
       point = new Point 8, -2.5
 
       assert.equal point.getX(), 8
