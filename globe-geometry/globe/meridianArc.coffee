@@ -4,6 +4,8 @@
 
 goog.provide 'globeGeometry.globe.MeridianArc'
 
+goog.require "goog.math.Range"
+
 class globeGeometry.globe.MeridianArc
 
   ###*
@@ -13,37 +15,51 @@ class globeGeometry.globe.MeridianArc
     @final
   ###
   constructor: (@start, @end) ->
+    @range = new goog.math.Range @start, @end
 
   ###*
-    @param {number} lat
-    @return {boolean}
+    @return {number}
   ###
-  contains: (lat) ->
-    false
+  getStart: () ->
+    return @start
 
   ###*
-    @param {number} lat
+    @return {number}
+  ###
+  getEnd: () ->
+    return @end
+
+  ###*
+    @param {number} point
     @return {boolean}
   ###
-  extend: (lat) ->
-    false
+  contains: (point) ->
+    return goog.math.Range.containsPoint @range, point
+
+  ###*
+    @param {number} point
+  ###
+  extend: (point) ->
+    @start = point if point < @start
+    @end = point if point > @end
+    @range.includePoint point
 
   ###*
     @return {number}
     @private
   ###
   getCenter: () ->
-    null
+    return (@range.start + @range.end) / 2
 
   ###*
     @param {globeGeometry.LatLng} latLng
     @return {boolean}
   ###
   intersects: (latLng) ->
-    false
+    return @contains latLng.getLat()
 
   ###*
     @return {boolean}
   ###
   isEmpty: () ->
-    false
+    return @end < @start
