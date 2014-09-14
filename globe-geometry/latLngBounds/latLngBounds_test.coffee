@@ -57,20 +57,43 @@ suite 'globeGeometry.LatLngBounds', ->
 
       assert.isFalse bounds.equals(bounds2), "Bounds is not equal with different bounds"
 
-  suite 'crossesMeridian', ->
+  suite 'crossesDateMeridian', ->
+    createBounds = (swLat, swLng, neLat, neLng) ->
+      sw = new LatLng swLat, swLng
+      ne = new LatLng neLat, neLng
+      bounds = new LatLngBounds sw, ne
+
     test 'should work with empty', ->
       bounds = new LatLngBounds()
 
-      assert.isFalse bounds.crossesMeridian(), "Empty bounds does not cross meridian"
+      assert.isFalse bounds.crossesDateMeridian(), "Empty bounds does not cross meridian"
 
     test 'should work with semi defined', ->
       bounds = new LatLngBounds new LatLng 3, 4
 
-      assert.isFalse bounds.crossesMeridian(), "Semi defined bounds does not cross meridian"
+      assert.isFalse bounds.crossesDateMeridian(), "Semi defined bounds does not cross meridian"
 
     test 'should work with semi defined on meridian', ->
       bounds = new LatLngBounds new LatLng 4, 180
       bounds2 = new LatLngBounds new LatLng 4, -180
 
-      assert.isTrue bounds.crossesMeridian(), "(4, 180) does cross meridian"
-      assert.isTrue bounds2.crossesMeridian(), "(4, -180) does cross meridian"
+      assert.isTrue bounds.crossesDateMeridian(), "(4, 180) does cross meridian"
+      assert.isTrue bounds2.crossesDateMeridian(), "(4, -180) does cross meridian"
+
+    test 'should work with non crossing', ->
+      bounds = createBounds 14.944784875088372, 18.984375, 43.58039085560786, 56.953125
+      assert.isFalse bounds.crossesDateMeridian()
+      bounds = createBounds 15.961329081596647, -129.375, 60.413852350464936, 55.1953125
+      assert.isFalse bounds.crossesDateMeridian()
+      bounds = createBounds -45.82879925192133, 111.09375, 8.059229627200192, 176.484375
+      assert.isFalse bounds.crossesDateMeridian()
+      bounds = createBounds -38.8225909761771, -167.34375, 66.23145747862573, 168.75
+      assert.isFalse bounds.crossesDateMeridian()
+
+    test 'should work with crossing', ->
+      bounds = createBounds -52.268157373768155, 139.921875, 16.29905101458183, -115.3125
+      assert.isTrue bounds.crossesDateMeridian()
+      bounds = createBounds 10.83330598364249, 115.6640625, 36.87962060502676, -141.328125
+      assert.isTrue bounds.crossesDateMeridian()
+      bounds = createBounds -48.92249926375824, 156.09375, 30.14512718337613, 130.78125
+      assert.isTrue bounds.crossesDateMeridian()
