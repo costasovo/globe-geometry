@@ -46,7 +46,6 @@ class globeGeometry.globe.MeridianArc
 
   ###*
     @return {number}
-    @private
   ###
   getCenter: () ->
     return (@range.start + @range.end) / 2

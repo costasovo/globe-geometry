@@ -23,6 +23,9 @@ suite 'globeGeometry.globe.ParallelArc', ->
       arc = new ParallelArc 0, -1
       assert.isTrue arc.crossesDateMeridian()
 
+      arc = new ParallelArc -170, -175
+      assert.isTrue arc.crossesDateMeridian()
+
   suite 'crossesZeroMeridian', ->
     test 'should work for non crossing', ->
       arc = new ParallelArc 10, 20

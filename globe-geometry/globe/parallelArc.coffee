@@ -28,14 +28,12 @@ class globeGeometry.globe.ParallelArc
 
   ###*
     @return {boolean}
-    @private
   ###
   crossesDateMeridian: () ->
     return @start > @end
 
   ###*
     @return {boolean}
-    @private
   ###
   crossesZeroMeridian: () ->
     return true if @start < 0 && @end > 0
@@ -58,7 +56,6 @@ class globeGeometry.globe.ParallelArc
 
   ###*
     @return {number}
-    @private
   ###
   getCenter: () ->
     return
