@@ -33,7 +33,7 @@ class globeGeometry.globe.ParallelArc
     @private
   ###
   getCenter: () ->
-    null
+    return
 
   ###*
     @param {globeGeometry.LatLng} latLng
