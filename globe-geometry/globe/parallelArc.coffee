@@ -15,6 +15,34 @@ class globeGeometry.globe.ParallelArc
   constructor: (@start, @end) ->
 
   ###*
+    @return {number}
+  ###
+  getStart: () ->
+    return @start
+
+  ###*
+    @return {number}
+  ###
+  getEnd: () ->
+    return @end
+
+  ###*
+    @return {boolean}
+    @private
+  ###
+  crossesDateMeridian: () ->
+    return @start > @end
+
+  ###*
+    @return {boolean}
+    @private
+  ###
+  crossesZeroMeridian: () ->
+    return true if @start < 0 && @end > 0
+    return true if @start > 0 && @end > 0 && @crossesDateMeridian()
+    return false
+
+  ###*
     @param {number} lat
     @return {boolean}
   ###
