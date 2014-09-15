@@ -58,7 +58,12 @@ class globeGeometry.globe.ParallelArc
     @return {number}
   ###
   getCenter: () ->
-    return
+    if @crossesDateMeridian()
+      sign = 1
+      sign = -1 if @start > 0 && @end > 0
+      return (@start + @end) / 2 + sign*180
+    else
+      return (@start + @end) / 2
 
   ###*
     @param {globeGeometry.LatLng} latLng

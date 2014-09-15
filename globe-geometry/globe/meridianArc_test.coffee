@@ -59,6 +59,12 @@ suite 'globeGeometry.globe.MeridianArc', ->
       arc = new MeridianArc 0, 2
       assert.equal arc.getCenter(), 1
 
+      arc = new MeridianArc -30, -10
+      assert.equal arc.getCenter(), -20
+
+      arc = new MeridianArc -30, 20
+      assert.equal arc.getCenter(), -5
+
   suite 'intersects', ->
     test 'should work', ->
       arc = new MeridianArc 0, 45
