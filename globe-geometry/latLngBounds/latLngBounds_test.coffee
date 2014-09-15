@@ -1,4 +1,8 @@
 suite 'globeGeometry.LatLngBounds', ->
+  createBounds = (swLat, swLng, neLat, neLng) ->
+    sw = new LatLng swLat, swLng
+    ne = new LatLng neLat, neLng
+    bounds = new LatLngBounds sw, ne
 
   LatLng = globeGeometry.LatLng
   LatLngBounds = globeGeometry.LatLngBounds
@@ -58,10 +62,6 @@ suite 'globeGeometry.LatLngBounds', ->
       assert.isFalse bounds.equals(bounds2), "Bounds is not equal with different bounds"
 
   suite 'crossesDateMeridian', ->
-    createBounds = (swLat, swLng, neLat, neLng) ->
-      sw = new LatLng swLat, swLng
-      ne = new LatLng neLat, neLng
-      bounds = new LatLngBounds sw, ne
 
     test 'should work with empty', ->
       bounds = new LatLngBounds()
@@ -97,3 +97,25 @@ suite 'globeGeometry.LatLngBounds', ->
       assert.isTrue bounds.crossesDateMeridian()
       bounds = createBounds -48.92249926375824, 156.09375, 30.14512718337613, 130.78125
       assert.isTrue bounds.crossesDateMeridian()
+
+  suite 'getCenter', ->
+    test 'should work', ->
+      bounds = createBounds -29.84064389983441, -59.765625, 21.616579336740603, 33.75
+      center = new LatLng -4.112032281546904, -13.0078125
+      assert.equal center.toString(), bounds.getCenter().toString()
+
+      bounds = createBounds -56.55948248376223, 151.875, 43.068887774169625, -47.109375
+      center = new LatLng -6.745297354796303, -127.6171875
+      assert.equal center.toString(), bounds.getCenter().toString()
+
+      bounds = createBounds -34.016241889667015, 67.5, 22.917922936146045, 171.9140625
+      center = new LatLng -5.549159476760485, 119.70703125
+      assert.equal center.toString(), bounds.getCenter().toString()
+
+      bounds = createBounds 14.944784875088372, 156.4453125, 52.482780222078226, -161.71875
+      center = new LatLng 33.713782548583296, 177.36328125
+      assert.equal center.toString(), bounds.getCenter().toString()
+
+      bounds = createBounds -43.32517767999295, 132.1875, 11.178401873711785, -131.484375
+      center = new LatLng -16.07338790314058, -179.6484375
+      assert.equal center.toString(), bounds.getCenter().toString()

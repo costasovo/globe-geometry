@@ -70,3 +70,13 @@ class globeGeometry.LatLngBounds
   ###
   isEDef: () ->
     return goog.isDefAndNotNull(@sw) && goog.isDefAndNotNull(@ne)
+
+  ###*
+    @return {globeGeometry.LatLng}
+    @export
+  ###
+  getCenter: () ->
+    return null if @isEmpty()
+    lat = @meridianArc.getCenter()
+    lng = @parallelArc.getCenter()
+    return new globeGeometry.LatLng lat, lng
