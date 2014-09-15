@@ -76,3 +76,6 @@ suite 'globeGeometry.globe.ParallelArc', ->
 
       arc = new ParallelArc 156.09375, 92.109375
       assert.equal arc.getCenter(), -55.8984375
+
+      arc = new ParallelArc 151.875, -47.109375
+      assert.equal arc.getCenter(), -127.6171875
