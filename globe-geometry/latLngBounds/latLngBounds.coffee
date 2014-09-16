@@ -80,3 +80,14 @@ class globeGeometry.LatLngBounds
     lat = @meridianArc.getCenter()
     lng = @parallelArc.getCenter()
     return new globeGeometry.LatLng lat, lng
+
+  ###*
+    @param {globeGeometry.LatLng} point
+    @return {boolean}
+    @export
+  ###
+  contains: (point) ->
+    return false if @isEmpty()
+    latOk = @meridianArc.contains point.getLat()
+    lngOk = @parallelArc.contains point.getLng()
+    return latOk && lngOk

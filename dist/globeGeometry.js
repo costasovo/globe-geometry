@@ -1872,95 +1872,152 @@ goog.math.safeCeil = function(num, opt_epsilon) {
   goog.asserts.assert(!goog.isDef(opt_epsilon) || opt_epsilon > 0);
   return Math.ceil(num - (opt_epsilon || 2E-15));
 };
-goog.provide("goog.math.Coordinate");
-goog.require("goog.math");
-goog.math.Coordinate = function(opt_x, opt_y) {
-  this.x = goog.isDef(opt_x) ? opt_x : 0;
-  this.y = goog.isDef(opt_y) ? opt_y : 0;
+goog.provide("goog.math.Range");
+goog.require("goog.asserts");
+goog.math.Range = function(a, b) {
+  this.start = a < b ? a : b;
+  this.end = a < b ? b : a;
 };
-goog.math.Coordinate.prototype.clone = function() {
-  return new goog.math.Coordinate(this.x, this.y);
+goog.math.Range.fromPair = function(pair) {
+  goog.asserts.assert(pair.length == 2);
+  return new goog.math.Range(pair[0], pair[1]);
+};
+goog.math.Range.prototype.clone = function() {
+  return new goog.math.Range(this.start, this.end);
+};
+goog.math.Range.prototype.getLength = function() {
+  return this.end - this.start;
+};
+goog.math.Range.prototype.includePoint = function(point) {
+  this.start = Math.min(this.start, point);
+  this.end = Math.max(this.end, point);
+};
+goog.math.Range.prototype.includeRange = function(range) {
+  this.start = Math.min(this.start, range.start);
+  this.end = Math.max(this.end, range.end);
 };
 if (goog.DEBUG) {
-  goog.math.Coordinate.prototype.toString = function() {
-    return "(" + this.x + ", " + this.y + ")";
+  goog.math.Range.prototype.toString = function() {
+    return "[" + this.start + ", " + this.end + "]";
   };
 }
-goog.math.Coordinate.equals = function(a, b) {
+goog.math.Range.equals = function(a, b) {
   if (a == b) {
     return true;
   }
   if (!a || !b) {
     return false;
   }
-  return a.x == b.x && a.y == b.y;
+  return a.start == b.start && a.end == b.end;
 };
-goog.math.Coordinate.distance = function(a, b) {
-  var dx = a.x - b.x;
-  var dy = a.y - b.y;
-  return Math.sqrt(dx * dx + dy * dy);
+goog.math.Range.intersection = function(a, b) {
+  var c0 = Math.max(a.start, b.start);
+  var c1 = Math.min(a.end, b.end);
+  return c0 <= c1 ? new goog.math.Range(c0, c1) : null;
 };
-goog.math.Coordinate.magnitude = function(a) {
-  return Math.sqrt(a.x * a.x + a.y * a.y);
+goog.math.Range.hasIntersection = function(a, b) {
+  return Math.max(a.start, b.start) <= Math.min(a.end, b.end);
 };
-goog.math.Coordinate.azimuth = function(a) {
-  return goog.math.angle(0, 0, a.x, a.y);
+goog.math.Range.boundingRange = function(a, b) {
+  return new goog.math.Range(Math.min(a.start, b.start), Math.max(a.end, b.end));
 };
-goog.math.Coordinate.squaredDistance = function(a, b) {
-  var dx = a.x - b.x;
-  var dy = a.y - b.y;
-  return dx * dx + dy * dy;
+goog.math.Range.contains = function(a, b) {
+  return a.start <= b.start && a.end >= b.end;
 };
-goog.math.Coordinate.difference = function(a, b) {
-  return new goog.math.Coordinate(a.x - b.x, a.y - b.y);
+goog.math.Range.containsPoint = function(range, p) {
+  return range.start <= p && range.end >= p;
 };
-goog.math.Coordinate.sum = function(a, b) {
-  return new goog.math.Coordinate(a.x + b.x, a.y + b.y);
+goog.provide("globeGeometry.globe.MeridianArc");
+goog.require("goog.math.Range");
+globeGeometry.globe.MeridianArc = function(start, end) {
+  this.start = start;
+  this.end = end;
+  this.range = new goog.math.Range(this.start, this.end);
 };
-goog.math.Coordinate.prototype.ceil = function() {
-  this.x = Math.ceil(this.x);
-  this.y = Math.ceil(this.y);
-  return this;
+globeGeometry.globe.MeridianArc.prototype.getStart = function() {
+  return this.start;
 };
-goog.math.Coordinate.prototype.floor = function() {
-  this.x = Math.floor(this.x);
-  this.y = Math.floor(this.y);
-  return this;
+globeGeometry.globe.MeridianArc.prototype.getEnd = function() {
+  return this.end;
 };
-goog.math.Coordinate.prototype.round = function() {
-  this.x = Math.round(this.x);
-  this.y = Math.round(this.y);
-  return this;
+globeGeometry.globe.MeridianArc.prototype.contains = function(point) {
+  return goog.math.Range.containsPoint(this.range, point);
 };
-goog.math.Coordinate.prototype.translate = function(tx, opt_ty) {
-  if (tx instanceof goog.math.Coordinate) {
-    this.x += tx.x;
-    this.y += tx.y;
+globeGeometry.globe.MeridianArc.prototype.extend = function(point) {
+  if (point < this.start) {
+    this.start = point;
+  }
+  if (point > this.end) {
+    this.end = point;
+  }
+  return this.range.includePoint(point);
+};
+globeGeometry.globe.MeridianArc.prototype.getCenter = function() {
+  return(this.range.start + this.range.end) / 2;
+};
+globeGeometry.globe.MeridianArc.prototype.intersects = function(latLng) {
+  return this.contains(latLng.getLat());
+};
+globeGeometry.globe.MeridianArc.prototype.isEmpty = function() {
+  return this.end < this.start;
+};
+goog.provide("globeGeometry.globe.ParallelArc");
+globeGeometry.globe.ParallelArc = function(start, end) {
+  this.start = start;
+  this.end = end;
+};
+globeGeometry.globe.ParallelArc.prototype.getStart = function() {
+  return this.start;
+};
+globeGeometry.globe.ParallelArc.prototype.getEnd = function() {
+  return this.end;
+};
+globeGeometry.globe.ParallelArc.prototype.crossesDateMeridian = function() {
+  return this.start > this.end;
+};
+globeGeometry.globe.ParallelArc.prototype.crossesZeroMeridian = function() {
+  if (this.start < 0 && this.end > 0) {
+    return true;
+  }
+  if (this.start > 0 && (this.end > 0 && this.crossesDateMeridian())) {
+    return true;
+  }
+  if (this.start < 0 && (this.end < 0 && this.crossesDateMeridian())) {
+    return true;
+  }
+  return false;
+};
+globeGeometry.globe.ParallelArc.prototype.contains = function(lat) {
+  if (this.crossesDateMeridian() && this.crossesZeroMeridian()) {
+    return lat >= this.start && lat <= 180 || lat <= this.end;
   } else {
-    this.x += tx;
-    if (goog.isNumber(opt_ty)) {
-      this.y += opt_ty;
+    if (this.crossesDateMeridian()) {
+      return lat <= this.start || lat <= this.end;
+    } else {
+      return lat >= this.start && lat <= this.end;
     }
   }
-  return this;
 };
-goog.math.Coordinate.prototype.scale = function(sx, opt_sy) {
-  var sy = goog.isNumber(opt_sy) ? opt_sy : sx;
-  this.x *= sx;
-  this.y *= sy;
-  return this;
+globeGeometry.globe.ParallelArc.prototype.extend = function(lat) {
+  return false;
 };
-goog.math.Coordinate.prototype.rotateRadians = function(radians, opt_center) {
-  var center = opt_center || new goog.math.Coordinate(0, 0);
-  var x = this.x;
-  var y = this.y;
-  var cos = Math.cos(radians);
-  var sin = Math.sin(radians);
-  this.x = (x - center.x) * cos - (y - center.y) * sin + center.x;
-  this.y = (x - center.x) * sin + (y - center.y) * cos + center.y;
+globeGeometry.globe.ParallelArc.prototype.getCenter = function() {
+  var center;
+  if (this.crossesDateMeridian()) {
+    center = (this.start + this.end) / 2;
+    if (center <= 0) {
+      return center + 180;
+    }
+    return center - 180;
+  } else {
+    return(this.start + this.end) / 2;
+  }
 };
-goog.math.Coordinate.prototype.rotateDegrees = function(degrees, opt_center) {
-  this.rotateRadians(goog.math.toRadians(degrees), opt_center);
+globeGeometry.globe.ParallelArc.prototype.intersects = function(latLng) {
+  return false;
+};
+globeGeometry.globe.ParallelArc.prototype.isEmpty = function() {
+  return false;
 };
 goog.provide("globeGeometry.math");
 goog.require("goog.math");
@@ -1986,12 +2043,12 @@ globeGeometry.math.round = function(num, precision) {
   pow = Math.pow(10, precision);
   return Math.round(num * pow) / pow;
 };
-goog.provide("globeGeometry.latLng.parser");
+goog.provide("globeGeometry.latLng.Parser");
 goog.require("goog.array");
 goog.require("globeGeometry.math");
-globeGeometry.latLng.parser = function() {
+globeGeometry.latLng.Parser = function() {
 };
-globeGeometry.latLng.parser.prototype.parseDms = function(dmsPair) {
+globeGeometry.latLng.Parser.prototype.parseDms = function(dmsPair) {
   var lat, lng, parts;
   parts = this.getLatLngParts(dmsPair);
   if (parts.length !== 2) {
@@ -2004,7 +2061,7 @@ globeGeometry.latLng.parser.prototype.parseDms = function(dmsPair) {
   }
   return[lat, lng];
 };
-globeGeometry.latLng.parser.prototype.parseDdm = function(ddmPair) {
+globeGeometry.latLng.Parser.prototype.parseDdm = function(ddmPair) {
   var lat, lng, parts;
   parts = this.getLatLngParts(ddmPair);
   if (parts.length !== 2) {
@@ -2017,7 +2074,7 @@ globeGeometry.latLng.parser.prototype.parseDdm = function(ddmPair) {
   }
   return[lat, lng];
 };
-globeGeometry.latLng.parser.prototype.parseDd = function(ddPair) {
+globeGeometry.latLng.Parser.prototype.parseDd = function(ddPair) {
   var lat, lng, parts;
   parts = this.getLatLngParts(ddPair);
   if (parts.length !== 2) {
@@ -2030,7 +2087,7 @@ globeGeometry.latLng.parser.prototype.parseDd = function(ddPair) {
   }
   return[lat, lng];
 };
-globeGeometry.latLng.parser.prototype.getLatLngParts = function(dmsPair) {
+globeGeometry.latLng.Parser.prototype.getLatLngParts = function(dmsPair) {
   var delimiter, delimiters, parts, _i, _len;
   delimiters = [", ", ","];
   for (_i = 0, _len = delimiters.length;_i < _len;_i++) {
@@ -2042,7 +2099,7 @@ globeGeometry.latLng.parser.prototype.getLatLngParts = function(dmsPair) {
   }
   return this.getLatLngPartsSeparatedBySpace(dmsPair);
 };
-globeGeometry.latLng.parser.prototype.getLatLngPartsSeparatedBySpace = function(dmsPair) {
+globeGeometry.latLng.Parser.prototype.getLatLngPartsSeparatedBySpace = function(dmsPair) {
   var lat, lng, parts;
   parts = dmsPair.split(" ");
   if (parts.length < 2) {
@@ -2055,7 +2112,7 @@ globeGeometry.latLng.parser.prototype.getLatLngPartsSeparatedBySpace = function(
   lng = goog.array.slice(parts, parts.length / 2).join("");
   return[lat, lng];
 };
-globeGeometry.latLng.parser.prototype.parseDmsPart = function(dms) {
+globeGeometry.latLng.Parser.prototype.parseDmsPart = function(dms) {
   var deg, nums;
   nums = this.getNumericParts(dms, 3);
   if (!goog.isArray(nums)) {
@@ -2064,7 +2121,7 @@ globeGeometry.latLng.parser.prototype.parseDmsPart = function(dms) {
   deg = nums[0] + nums[1] / 60 + nums[2] / 3600;
   return globeGeometry.math.toFixed(deg, 6);
 };
-globeGeometry.latLng.parser.prototype.parseDdmPart = function(ddm) {
+globeGeometry.latLng.Parser.prototype.parseDdmPart = function(ddm) {
   var deg, nums;
   nums = this.getNumericParts(ddm, 2);
   if (!goog.isArray(nums)) {
@@ -2073,7 +2130,7 @@ globeGeometry.latLng.parser.prototype.parseDdmPart = function(ddm) {
   deg = nums[0] + nums[1] / 60;
   return globeGeometry.math.toFixed(deg, 6);
 };
-globeGeometry.latLng.parser.prototype.parseDdPart = function(dd) {
+globeGeometry.latLng.Parser.prototype.parseDdPart = function(dd) {
   var nums;
   nums = this.getNumericParts(dd, 1);
   if (!goog.isArray(nums)) {
@@ -2081,7 +2138,7 @@ globeGeometry.latLng.parser.prototype.parseDdPart = function(dd) {
   }
   return globeGeometry.math.toFixed(nums[0], 6);
 };
-globeGeometry.latLng.parser.prototype.getNumericParts = function(str, count) {
+globeGeometry.latLng.Parser.prototype.getNumericParts = function(str, count) {
   var nums;
   nums = str.split(/[^0-9.,]+/);
   if (goog.array.peek(nums) === "") {
@@ -2094,9 +2151,127 @@ globeGeometry.latLng.parser.prototype.getNumericParts = function(str, count) {
     return goog.string.toNumber(num);
   });
 };
-goog.provide("globeGeometry.LatLng");
-goog.require("globeGeometry.latLng.parser");
+goog.provide("globeGeometry.Point");
 goog.require("globeGeometry.math");
+globeGeometry.Point = function(x, y) {
+  this.x = Number(x);
+  this.y = Number(y);
+};
+globeGeometry.Point.prototype.getX = function() {
+  return this.x;
+};
+globeGeometry.Point.prototype.getY = function() {
+  return this.y;
+};
+globeGeometry.Point.prototype.equals = function(point) {
+  return this.x === point.getX() && this.y === point.getY();
+};
+goog.provide("globeGeometry.mercator");
+goog.require("globeGeometry.Point");
+globeGeometry.mercator = function() {
+};
+globeGeometry.mercator.TILE_SIZE = 256;
+globeGeometry.mercator.fromLatLngToPoint = function(latLng, zoomLevel) {
+  var canvasSize, sinLat, x, y;
+  canvasSize = globeGeometry.mercator.TILE_SIZE * Math.pow(2, zoomLevel);
+  sinLat = Math.sin(latLng.getLat() * Math.PI / 180);
+  x = (latLng.getLng() + 180) / 360 * canvasSize;
+  y = (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * canvasSize;
+  return new globeGeometry.Point(x, y);
+};
+globeGeometry.mercator.fromLatLngToTile = function(latLng, zoomLevel) {
+  var point, x, y;
+  point = globeGeometry.mercator.fromLatLngToPoint(latLng, zoomLevel);
+  x = Math.floor(point.getX() / globeGeometry.mercator.TILE_SIZE);
+  y = Math.floor(point.getY() / globeGeometry.mercator.TILE_SIZE);
+  return new globeGeometry.mercator.Tile(x, y, zoomLevel);
+};
+goog.provide("globeGeometry.quadKey");
+goog.require("globeGeometry.mercator");
+globeGeometry.quadKey = function() {
+};
+globeGeometry.quadKey.fromLatLngToQuadKey = function(latLng, zoomLevel) {
+  var tile;
+  tile = globeGeometry.mercator.fromLatLngToTile(latLng, zoomLevel);
+  return globeGeometry.quadKey.fromTileToQuadKey(tile);
+};
+globeGeometry.quadKey.fromTileToQuadKey = function(tile) {
+  var digit, i, key, mask, _i, _ref;
+  key = "";
+  for (i = _i = _ref = tile.getZ();_ref <= 1 ? _i <= 1 : _i >= 1;i = _ref <= 1 ? ++_i : --_i) {
+    digit = 0;
+    mask = 1 << i - 1;
+    if ((tile.getX() & mask) !== 0) {
+      digit += 1;
+    }
+    if ((tile.getY() & mask) !== 0) {
+      digit += 2;
+    }
+    key += digit;
+  }
+  return key;
+};
+globeGeometry.quadKey.fromQuadKeyToTile = function(key) {
+  var i, mask, x, y, zoomLevel, _i;
+  x = y = 0;
+  zoomLevel = key.length;
+  for (i = _i = zoomLevel;zoomLevel <= 1 ? _i <= 1 : _i >= 1;i = zoomLevel <= 1 ? ++_i : --_i) {
+    mask = 1 << i - 1;
+    switch(key[zoomLevel - i]) {
+      case "0":
+        break;
+      case "1":
+        x |= mask;
+        break;
+      case "2":
+        y |= mask;
+        break;
+      case "3":
+        x |= mask;
+        y |= mask;
+        break;
+      default:
+        throw new Error("Invalid QuadKey digit sequence.");;
+    }
+  }
+  return new globeGeometry.mercator.Tile(x, y, zoomLevel);
+};
+goog.provide("globeGeometry.mercator.Tile");
+goog.require("globeGeometry.mercator");
+goog.require("globeGeometry.math");
+goog.require("globeGeometry.quadKey");
+globeGeometry.mercator.Tile = function(x, y, z) {
+  var max;
+  x = Math.round(Math.abs(Number(x)));
+  y = Math.round(Math.abs(Number(y)));
+  this.z = Math.round(Math.abs(Number(z)));
+  max = Math.pow(2, this.z) - 1;
+  this.x = goog.math.clamp(x, 0, max);
+  this.y = goog.math.clamp(y, 0, max);
+};
+globeGeometry.mercator.Tile.createInstance = function(quadKey) {
+  return globeGeometry.quadKey.fromQuadKeyToTile(quadKey);
+};
+globeGeometry.mercator.Tile.prototype.getX = function() {
+  return this.x;
+};
+globeGeometry.mercator.Tile.prototype.getY = function() {
+  return this.y;
+};
+globeGeometry.mercator.Tile.prototype.getZ = function() {
+  return this.z;
+};
+globeGeometry.mercator.Tile.prototype.equals = function(tile) {
+  return this.x === tile.getX() && (this.y === tile.getY() && this.z === tile.getZ());
+};
+globeGeometry.mercator.Tile.prototype.toQuadKey = function() {
+  return globeGeometry.quadKey.fromTileToQuadKey(this);
+};
+goog.provide("globeGeometry.LatLng");
+goog.require("globeGeometry.latLng.Parser");
+goog.require("globeGeometry.math");
+goog.require("globeGeometry.mercator.Tile");
+goog.require("globeGeometry.quadKey");
 goog.require("goog.math");
 globeGeometry.LatLng = function(lat, lng) {
   this.lat = goog.math.clamp(Number(lat), -90, 90);
@@ -2105,7 +2280,7 @@ globeGeometry.LatLng = function(lat, lng) {
 globeGeometry.LatLng.prototype.PRECISION = 9;
 globeGeometry.LatLng.createInstance = function(input) {
   var latLng, parser;
-  parser = new globeGeometry.latLng.parser;
+  parser = new globeGeometry.latLng.Parser;
   latLng = parser.parseDms(input);
   if (!goog.isArray(latLng)) {
     latLng = parser.parseDdm(input);
@@ -2188,7 +2363,13 @@ globeGeometry.LatLng.prototype.toDms = function(separator, precision) {
   lngLetter = this.getLng() < 0 ? "E" : "W";
   return dLat + "\u00b0" + mLat + "'" + sLat + '"' + latLetter + separator + dLng + "\u00b0" + mLng + "'" + sLng + '"' + lngLetter;
 };
+globeGeometry.LatLng.prototype.toQuadKey = function(zoomLevel) {
+  return globeGeometry.quadKey.fromLatLngToQuadKey(this, zoomLevel);
+};
 globeGeometry.LatLng.prototype.equals = function(other) {
+  if (!goog.isDefAndNotNull(other)) {
+    return false;
+  }
   return goog.math.nearlyEquals(this.getLat(), other.getLat()) && goog.math.nearlyEquals(this.getLng(), other.getLng());
 };
 goog.provide("globeGeometry.encoding");
@@ -2275,75 +2456,86 @@ globeGeometry.encoding.decodeSignedNumbers = function(encoded) {
   }
   return nums;
 };
-goog.provide("globeGeometry.mercator");
-goog.require("goog.math.Coordinate");
-globeGeometry.mercator = function() {
-};
-globeGeometry.mercator.TILE_SIZE = 256;
-globeGeometry.mercator.fromLatLngToPoint = function(latLng, zoomLevel) {
-  var canvasSize, sinLat, x, y;
-  canvasSize = globeGeometry.mercator.TILE_SIZE * Math.pow(2, zoomLevel);
-  sinLat = Math.sin(latLng.getLat() * Math.PI / 180);
-  x = (latLng.getLng() + 180) / 360 * canvasSize;
-  y = (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * canvasSize;
-  return new goog.math.Coordinate(x, y);
-};
-globeGeometry.mercator.fromLatLngToTile = function(latLng, zoomLevel) {
-  var point, x, y;
-  point = globeGeometry.mercator.fromLatLngToPoint(latLng, zoomLevel);
-  x = Math.floor(point.x / globeGeometry.mercator.TILE_SIZE);
-  y = Math.floor(point.y / globeGeometry.mercator.TILE_SIZE);
-  return new goog.math.Coordinate(x, y);
-};
-goog.provide("globeGeometry.quadKey");
-goog.require("globeGeometry.mercator");
-globeGeometry.quadKey = function() {
-};
-globeGeometry.quadKey.fromLatLngToQuadKey = function(latLng, zoomLevel) {
-  var tile;
-  tile = globeGeometry.mercator.fromLatLngToTile(latLng, zoomLevel);
-  return globeGeometry.quadKey.fromTileToQuadKey(tile, zoomLevel);
-};
-globeGeometry.quadKey.fromTileToQuadKey = function(tile, zoomLevel) {
-  var digit, i, key, mask, _i;
-  key = "";
-  for (i = _i = zoomLevel;zoomLevel <= 1 ? _i <= 1 : _i >= 1;i = zoomLevel <= 1 ? ++_i : --_i) {
-    digit = 0;
-    mask = 1 << i - 1;
-    if ((tile.x & mask) !== 0) {
-      digit += 1;
-    }
-    if ((tile.y & mask) !== 0) {
-      digit += 2;
-    }
-    key += digit;
+goog.provide("globeGeometry.LatLngBounds");
+goog.require("globeGeometry.LatLng");
+goog.require("globeGeometry.globe.MeridianArc");
+goog.require("globeGeometry.globe.ParallelArc");
+goog.require("globeGeometry.LatLng");
+globeGeometry.LatLngBounds = function(sw, ne) {
+  this.sw = sw;
+  this.ne = ne;
+  if (goog.isDefAndNotNull(this.sw) && goog.isDefAndNotNull(this.ne)) {
+    this.meridianArc = new globeGeometry.globe.MeridianArc(this.sw.getLat(), this.ne.getLat());
+    this.parallelArc = new globeGeometry.globe.ParallelArc(this.sw.getLng(), this.ne.getLng());
   }
-  return key;
 };
-globeGeometry.quadKey.fromQuadKeyToTile = function(key) {
-  var i, mask, x, y, zoomLevel, _i;
-  x = y = 0;
-  zoomLevel = key.length;
-  for (i = _i = zoomLevel;zoomLevel <= 1 ? _i <= 1 : _i >= 1;i = zoomLevel <= 1 ? ++_i : --_i) {
-    mask = 1 << i - 1;
-    switch(key[zoomLevel - i]) {
-      case "0":
-        break;
-      case "1":
-        x |= mask;
-        break;
-      case "2":
-        y |= mask;
-        break;
-      case "3":
-        x |= mask;
-        y |= mask;
-        break;
-      default:
-        throw new Error("Invalid QuadKey digit sequence.");;
-    }
+globeGeometry.LatLngBounds.prototype.getNorthEast = function() {
+  return this.ne;
+};
+globeGeometry.LatLngBounds.prototype.getSouthWest = function() {
+  return this.sw;
+};
+globeGeometry.LatLngBounds.prototype.isEmpty = function() {
+  return!goog.isDefAndNotNull(this.sw) && !goog.isDefAndNotNull(this.ne);
+};
+globeGeometry.LatLngBounds.prototype.equals = function(bounds) {
+  var ne, sw;
+  if (this.isEmpty() && bounds.isEmpty()) {
+    return true;
   }
-  return new goog.math.Coordinate(x, y);
+  sw = bounds.getSouthWest();
+  ne = bounds.getNorthEast();
+  if (this.sw.equals(sw) && (!goog.isDefAndNotNull(ne) && !goog.isDefAndNotNull(this.ne))) {
+    return true;
+  }
+  return sw.equals(this.sw) && ne.equals(this.ne);
+};
+globeGeometry.LatLngBounds.prototype.crossesDateMeridian = function() {
+  if (this.isEmpty()) {
+    return false;
+  }
+  if (this.sw.getLng() === 180 || this.sw.getLng() === -180) {
+    return true;
+  }
+  if (!goog.isDefAndNotNull(this.parallelArc)) {
+    return false;
+  }
+  return this.parallelArc.crossesDateMeridian();
+};
+globeGeometry.LatLngBounds.prototype.isEDef = function() {
+  return goog.isDefAndNotNull(this.sw) && goog.isDefAndNotNull(this.ne);
+};
+globeGeometry.LatLngBounds.prototype.getCenter = function() {
+  var lat, lng;
+  if (this.isEmpty()) {
+    return null;
+  }
+  lat = this.meridianArc.getCenter();
+  lng = this.parallelArc.getCenter();
+  return new globeGeometry.LatLng(lat, lng);
+};
+globeGeometry.LatLngBounds.prototype.contains = function(point) {
+  var latOk, lngOk;
+  if (this.isEmpty()) {
+    return false;
+  }
+  latOk = this.meridianArc.contains(point.getLat());
+  lngOk = this.parallelArc.contains(point.getLng());
+  return latOk && lngOk;
+};
+goog.provide("globeGeometry.Size");
+globeGeometry.Size = function(width, height) {
+  this.width = Number(width);
+  this.height = Number(height);
+};
+globeGeometry.Size.prototype.getWidth = function() {
+  return this.width;
+};
+globeGeometry.Size.prototype.getHeight = function() {
+  return this.height;
+};
+globeGeometry.Size.prototype.equals = function(size) {
+  return this.width === size.getWidth() && this.height === size.getHeight();
 };
 goog.provide("globeGeometry.spherical");
 goog.require("goog.math");

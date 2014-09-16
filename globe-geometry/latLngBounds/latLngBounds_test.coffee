@@ -119,3 +119,29 @@ suite 'globeGeometry.LatLngBounds', ->
       bounds = createBounds -43.32517767999295, 132.1875, 11.178401873711785, -131.484375
       center = new LatLng -16.07338790314058, -179.6484375
       assert.equal center.toString(), bounds.getCenter().toString()
+
+  suite 'contains', ->
+    testBounds = (latLngs, expected) ->
+      for latLng in latLngs
+        sw = new LatLng latLng[0], latLng[1]
+        ne = new LatLng latLng[2], latLng[3]
+        point = new LatLng latLng[4], latLng[5]
+        bounds = new LatLngBounds sw, ne
+        assert.deepEqual bounds.contains(point), expected
+
+    test 'should work for point inside', ->
+      inputs = [
+        [-15.961329081596634, -31.2890625, 31.353636941500987, 22.5, 11.178401873711785, -0.3515625]
+        [-49.837982453084834, 137.8125, 36.03133177633189, 94.21875, -10.487811882056695, 70.3125]
+        [-28.30438068296277, 119.53125, 49.837982453084834, -111.796875, 19.31114335506464, -160.3125]
+        [-55.97379820507658, -35.859375, -19.31114335506463, 56.25, -43.58039085560784, 41.1328125]
+      ]
+      testBounds inputs, true
+
+    test 'should work for point inside', ->
+      inputs = [
+        [22.26876403907398, 43.59375, 48.22467264956519, 98.4375, -16.63619187839765, 78.3984375]
+        [-48.92249926375824, 156.796875, 36.5978891330702, -57.65625, -56.55948248376223, -11.953125]
+        [-34.88593094075315, -89.296875, 30.751277776257812, -127.265625, 9.102096738726456, -108.984375]
+      ]
+      testBounds inputs, false
