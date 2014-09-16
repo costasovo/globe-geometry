@@ -38,6 +38,7 @@ class globeGeometry.globe.ParallelArc
   crossesZeroMeridian: () ->
     return true if @start < 0 && @end > 0
     return true if @start > 0 && @end > 0 && @crossesDateMeridian()
+    return true if @start < 0 && @end < 0 && @crossesDateMeridian()
     return false
 
   ###*

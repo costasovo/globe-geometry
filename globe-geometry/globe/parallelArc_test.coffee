@@ -26,6 +26,9 @@ suite 'globeGeometry.globe.ParallelArc', ->
       arc = new ParallelArc -170, -175
       assert.isTrue arc.crossesDateMeridian()
 
+      arc = new ParallelArc -107.578125, -146.953125
+      assert.isTrue arc.crossesDateMeridian()
+
   suite 'crossesZeroMeridian', ->
     test 'should work for non crossing', ->
       arc = new ParallelArc 10, 20
@@ -38,11 +41,15 @@ suite 'globeGeometry.globe.ParallelArc', ->
       assert.isFalse arc.crossesZeroMeridian()
 
     test 'should work for crossing', ->
-      arc = new ParallelArc -10, 20
-      assert.isTrue arc.crossesZeroMeridian()
-
-      arc = new ParallelArc 170, 100
-      assert.isTrue arc.crossesZeroMeridian()
+      inputs = [
+        [-10, 20]
+        [170, 100]
+        [-107.578125, -146.953125]
+        [149.0625, 98.4375]
+      ]
+      for input in inputs
+        arc = new ParallelArc input[0], input[1]
+        assert.isTrue arc.crossesZeroMeridian()
 
   suite 'getCenter', ->
     test 'should work for non crossing date meridian', ->
