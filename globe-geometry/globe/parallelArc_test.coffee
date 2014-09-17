@@ -98,10 +98,11 @@ suite 'globeGeometry.globe.ParallelArc', ->
         [-146.953125, 87.890625, -29.53125]
         [-107.578125, -146.953125, 52.734375]
         [149.0625, 98.4375, -56.25]
+        [140.625, -88.59375, 153.984375]
       ]
       for input in inputs
         arc = new ParallelArc input[0], input[1]
-        assert.isTrue arc.contains input[2]
+        assert.isTrue arc.contains(input[2]), input
 
     test 'should work for points outside', ->
       inputs = [
@@ -111,7 +112,6 @@ suite 'globeGeometry.globe.ParallelArc', ->
         [-149.0625, 152.578125, -179]
         [24.609375, 111.796875, 0]
         [-155.390625, -93.515625, 124.453125]
-        [140.625, -88.59375, 153.984375]
         [-146.953125, 87.890625, 99.53125]
         [-146.953125, 87.890625, -179.53125]
         [-107.578125, -146.953125, -120.734375]

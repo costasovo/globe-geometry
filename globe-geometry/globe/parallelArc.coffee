@@ -49,7 +49,7 @@ class globeGeometry.globe.ParallelArc
     if @crossesDateMeridian() && @crossesZeroMeridian()
       return (lat >= @start && lat <= 180) || (lat <= @end)
     else if @crossesDateMeridian()
-      return lat <= @start || lat <= @end
+      return lat >= @start || lat <= @end
     else
       return lat >= @start && lat <= @end
   ###*
