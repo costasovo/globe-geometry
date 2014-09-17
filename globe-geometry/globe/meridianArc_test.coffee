@@ -68,10 +68,15 @@ suite 'globeGeometry.globe.MeridianArc', ->
   suite 'intersects', ->
     test 'should work', ->
       arc = new MeridianArc 0, 45
-      point = new LatLng -3, 12
-      point2 = new LatLng 4.1234, 12,67643
-      assert.isFalse arc.intersects point
-      assert.isTrue arc.intersects point2
+      arcIn = new MeridianArc 10, 20
+      arcHalfIn = new MeridianArc -10, 20
+      arcHalfIn2 = new MeridianArc 30, 50
+      arcOut = new MeridianArc 50, 60
+
+      assert.isFalse arc.intersects arcOut
+      assert.isTrue arc.intersects arcIn
+      assert.isTrue arc.intersects arcHalfIn
+      assert.isTrue arc.intersects arcHalfIn2
 
   suite 'isEmpty', ->
     test 'should work', ->

@@ -51,11 +51,11 @@ class globeGeometry.globe.MeridianArc
     return (@range.start + @range.end) / 2
 
   ###*
-    @param {globeGeometry.LatLng} latLng
+    @param {globeGeometry.globe.MeridianArc} other
     @return {boolean}
   ###
-  intersects: (latLng) ->
-    return @contains latLng.getLat()
+  intersects: (other) ->
+    return goog.math.Range.hasIntersection @range, other
 
   ###*
     @return {boolean}
