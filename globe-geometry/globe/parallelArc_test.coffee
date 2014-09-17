@@ -128,7 +128,7 @@ suite 'globeGeometry.globe.ParallelArc', ->
         arc2 = new ParallelArc input[2], input[3]
         assert.deepEqual arc.intersects(arc2), expected, input
 
-    test.skip 'should work for arc inside', ->
+    test 'should work for arc inside', ->
       inputs = [
         [20, 50, 30, 35]
         [-30, 20, -5, 10]
@@ -137,7 +137,7 @@ suite 'globeGeometry.globe.ParallelArc', ->
       ]
       testAcr inputs, true
 
-    test.skip 'should work for arc partialy inside', ->
+    test 'should work for arc partialy inside', ->
       inputs = [
         [45, 60, 50, 80]
         [160, -20, -170, 20]
