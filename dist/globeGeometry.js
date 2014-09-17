@@ -1940,6 +1940,9 @@ globeGeometry.globe.MeridianArc.prototype.getStart = function() {
 globeGeometry.globe.MeridianArc.prototype.getEnd = function() {
   return this.end;
 };
+globeGeometry.globe.MeridianArc.prototype.getRange = function() {
+  return this.range;
+};
 globeGeometry.globe.MeridianArc.prototype.contains = function(point) {
   return goog.math.Range.containsPoint(this.range, point);
 };
@@ -1955,8 +1958,11 @@ globeGeometry.globe.MeridianArc.prototype.extend = function(point) {
 globeGeometry.globe.MeridianArc.prototype.getCenter = function() {
   return(this.range.start + this.range.end) / 2;
 };
-globeGeometry.globe.MeridianArc.prototype.intersects = function(latLng) {
-  return this.contains(latLng.getLat());
+globeGeometry.globe.MeridianArc.prototype.intersects = function(other) {
+  if (this.isEmpty() || other.isEmpty()) {
+    return false;
+  }
+  return goog.math.Range.hasIntersection(this.range, other.getRange());
 };
 globeGeometry.globe.MeridianArc.prototype.isEmpty = function() {
   return this.end < this.start;
@@ -1992,7 +1998,7 @@ globeGeometry.globe.ParallelArc.prototype.contains = function(lat) {
     return lat >= this.start && lat <= 180 || lat <= this.end;
   } else {
     if (this.crossesDateMeridian()) {
-      return lat <= this.start || lat <= this.end;
+      return lat >= this.start || lat <= this.end;
     } else {
       return lat >= this.start && lat <= this.end;
     }
@@ -2013,8 +2019,8 @@ globeGeometry.globe.ParallelArc.prototype.getCenter = function() {
     return(this.start + this.end) / 2;
   }
 };
-globeGeometry.globe.ParallelArc.prototype.intersects = function(latLng) {
-  return false;
+globeGeometry.globe.ParallelArc.prototype.intersects = function(other) {
+  return this.contains(other.getStart()) || (this.contains(other.getEnd()) || (other.contains(this.getStart()) || other.contains(this.getEnd())));
 };
 globeGeometry.globe.ParallelArc.prototype.isEmpty = function() {
   return false;
@@ -2475,6 +2481,12 @@ globeGeometry.LatLngBounds.prototype.getNorthEast = function() {
 globeGeometry.LatLngBounds.prototype.getSouthWest = function() {
   return this.sw;
 };
+globeGeometry.LatLngBounds.prototype.getMeridianArc = function() {
+  return this.meridianArc;
+};
+globeGeometry.LatLngBounds.prototype.getParallelArc = function() {
+  return this.parallelArc;
+};
 globeGeometry.LatLngBounds.prototype.isEmpty = function() {
   return!goog.isDefAndNotNull(this.sw) && !goog.isDefAndNotNull(this.ne);
 };
@@ -2522,6 +2534,12 @@ globeGeometry.LatLngBounds.prototype.contains = function(point) {
   latOk = this.meridianArc.contains(point.getLat());
   lngOk = this.parallelArc.contains(point.getLng());
   return latOk && lngOk;
+};
+globeGeometry.LatLngBounds.prototype.intersects = function(other) {
+  if (this.isEmpty() || other.isEmpty()) {
+    return false;
+  }
+  return this.meridianArc.intersects(other.getMeridianArc()) && this.parallelArc.intersects(other.getParallelArc());
 };
 goog.provide("globeGeometry.Size");
 globeGeometry.Size = function(width, height) {

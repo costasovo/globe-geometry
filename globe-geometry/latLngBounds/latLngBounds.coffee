@@ -36,6 +36,18 @@ class globeGeometry.LatLngBounds
   getSouthWest: () -> @sw
 
   ###*
+    @return {globeGeometry.globe.MeridianArc}
+  ###
+  getMeridianArc: () ->
+    return @meridianArc
+
+  ###*
+    @return {globeGeometry.globe.ParallelArc}
+  ###
+  getParallelArc: () ->
+    return @parallelArc
+
+  ###*
     @return {boolean}
     @export
   ###
@@ -91,3 +103,12 @@ class globeGeometry.LatLngBounds
     latOk = @meridianArc.contains point.getLat()
     lngOk = @parallelArc.contains point.getLng()
     return latOk && lngOk
+
+  ###*
+    @param {globeGeometry.LatLngBounds} other
+    @return {boolean}
+    @export
+  ###
+  intersects: (other) ->
+    return false if @isEmpty() || other.isEmpty()
+    return @meridianArc.intersects(other.getMeridianArc()) && @parallelArc.intersects(other.getParallelArc())
