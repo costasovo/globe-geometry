@@ -119,4 +119,36 @@ suite 'globeGeometry.globe.ParallelArc', ->
       ]
       for input in inputs
         arc = new ParallelArc input[0], input[1]
-        assert.isFalse arc.contains input[2]
+        assert.isFalse arc.contains(input[2]), input
+
+  suite 'intersects', ->
+    testAcr = (inputs, expected) ->
+      for input in inputs
+        arc = new ParallelArc input[0], input[1]
+        arc2 = new ParallelArc input[2], input[3]
+        assert.deepEqual arc.intersects(arc2), expected, input
+
+    test.skip 'should work for arc inside', ->
+      inputs = [
+        [20, 50, 30, 35]
+        [-30, 20, -5, 10]
+        [160, -100, 170, -170]
+        [120, 100, -40, 80]
+      ]
+      testAcr inputs, true
+
+    test.skip 'should work for arc partialy inside', ->
+      inputs = [
+        [45, 60, 50, 80]
+        [160, -20, -170, 20]
+        [120, -45, 10, 150]
+      ]
+      testAcr inputs, true
+
+    test 'should work for arc not intersecting', ->
+      inputs = [
+        [38, 60, 70, 120]
+        [150, 100, 120, 130]
+        [-40, 160, 170, -150]
+      ]
+      testAcr inputs, false

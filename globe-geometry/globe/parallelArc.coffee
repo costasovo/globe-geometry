@@ -71,11 +71,14 @@ class globeGeometry.globe.ParallelArc
       return (@start + @end) / 2
 
   ###*
-    @param {globeGeometry.LatLng} latLng
+    @param {globeGeometry.globe.ParallelArc} other
     @return {boolean}
   ###
-  intersects: (latLng) ->
-    false
+  intersects: (other) ->
+    return @contains(other.getStart()) ||
+      @contains(other.getEnd()) ||
+      other.contains(@getStart()) ||
+      other.contains(@getEnd())
 
   ###*
     @return {boolean}
