@@ -30,6 +30,12 @@ class globeGeometry.globe.MeridianArc
     return @end
 
   ###*
+    @return {goog.math.Range}
+  ###
+  getRange: () ->
+    return @range
+
+  ###*
     @param {number} point
     @return {boolean}
   ###
@@ -55,7 +61,8 @@ class globeGeometry.globe.MeridianArc
     @return {boolean}
   ###
   intersects: (other) ->
-    return goog.math.Range.hasIntersection @range, other
+    return false if @isEmpty() || other.isEmpty()
+    return goog.math.Range.hasIntersection @range, other.getRange()
 
   ###*
     @return {boolean}
