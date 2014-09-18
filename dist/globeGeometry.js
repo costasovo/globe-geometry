@@ -1994,14 +1994,10 @@ globeGeometry.globe.ParallelArc.prototype.crossesZeroMeridian = function() {
   return false;
 };
 globeGeometry.globe.ParallelArc.prototype.contains = function(lat) {
-  if (this.crossesDateMeridian() && this.crossesZeroMeridian()) {
-    return lat >= this.start && lat <= 180 || lat <= this.end;
+  if (this.crossesDateMeridian()) {
+    return lat >= this.start || lat <= this.end;
   } else {
-    if (this.crossesDateMeridian()) {
-      return lat >= this.start || lat <= this.end;
-    } else {
-      return lat >= this.start && lat <= this.end;
-    }
+    return lat >= this.start && lat <= this.end;
   }
 };
 globeGeometry.globe.ParallelArc.prototype.extend = function(lat) {
