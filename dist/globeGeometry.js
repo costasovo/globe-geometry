@@ -2541,6 +2541,15 @@ globeGeometry.LatLngBounds.prototype.intersects = function(other) {
   }
   return this.meridianArc.intersects(other.getMeridianArc()) && this.parallelArc.intersects(other.getParallelArc());
 };
+globeGeometry.LatLngBounds.prototype.toString = function() {
+  var ne, sw;
+  if (!goog.isDefAndNotNull(this.sw) && !goog.isDefAndNotNull(this.ne)) {
+    return "((1, 180), (-1, -180))";
+  }
+  sw = this.sw;
+  ne = goog.isDefAndNotNull(this.ne) ? this.ne : this.sw;
+  return "(" + sw.toString() + ", " + ne.toString() + ")";
+};
 goog.provide("globeGeometry.Size");
 globeGeometry.Size = function(width, height) {
   this.width = Number(width);

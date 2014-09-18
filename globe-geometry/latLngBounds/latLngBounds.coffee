@@ -112,3 +112,13 @@ class globeGeometry.LatLngBounds
   intersects: (other) ->
     return false if @isEmpty() || other.isEmpty()
     return @meridianArc.intersects(other.getMeridianArc()) && @parallelArc.intersects(other.getParallelArc())
+
+  ###*
+    @return {string}
+    @export
+  ###
+  toString: () ->
+    return '((1, 180), (-1, -180))' if !goog.isDefAndNotNull(@sw) && !goog.isDefAndNotNull(@ne) # Google maps has it this way
+    sw = @sw
+    ne = if goog.isDefAndNotNull @ne then @ne else @sw
+    return '(' + sw.toString() + ', ' + ne.toString() + ')';
