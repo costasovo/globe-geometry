@@ -2309,8 +2309,8 @@ globeGeometry.LatLng.prototype.toUrlValue = function(precision) {
   if (precision == null) {
     precision = 6;
   }
-  lat = globeGeometry.math.toFixed(this.getLat(), precision);
-  lng = globeGeometry.math.toFixed(this.getLng(), precision);
+  lat = globeGeometry.math.round(this.getLat(), precision);
+  lng = globeGeometry.math.round(this.getLng(), precision);
   return Number(lat) + "," + Number(lng);
 };
 globeGeometry.LatLng.prototype.toDd = function(separator, precision) {
@@ -2545,6 +2545,18 @@ globeGeometry.LatLngBounds.prototype.toString = function() {
   sw = this.sw;
   ne = goog.isDefAndNotNull(this.ne) ? this.ne : this.sw;
   return "(" + sw.toString() + ", " + ne.toString() + ")";
+};
+globeGeometry.LatLngBounds.prototype.toUrlValue = function(precision) {
+  var ne, sw;
+  if (precision == null) {
+    precision = 6;
+  }
+  if (!goog.isDefAndNotNull(this.sw) && !goog.isDefAndNotNull(this.ne)) {
+    return "1,180,-1,-180";
+  }
+  sw = this.sw;
+  ne = goog.isDefAndNotNull(this.ne) ? this.ne : this.sw;
+  return sw.toUrlValue(precision) + "," + ne.toUrlValue(precision);
 };
 goog.provide("globeGeometry.Size");
 globeGeometry.Size = function(width, height) {
