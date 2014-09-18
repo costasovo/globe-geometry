@@ -44,11 +44,12 @@ class globeGeometry.globe.MeridianArc
 
   ###*
     @param {number} point
+    @return {globeGeometry.globe.MeridianArc}
   ###
   extend: (point) ->
-    @start = point if point < @start
-    @end = point if point > @end
-    @range.includePoint point
+    start = if point < @start then point else @start
+    end = if point > @end then point else @end
+    return new globeGeometry.globe.MeridianArc start, end
 
   ###*
     @return {number}

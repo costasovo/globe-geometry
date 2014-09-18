@@ -1947,13 +1947,10 @@ globeGeometry.globe.MeridianArc.prototype.contains = function(point) {
   return goog.math.Range.containsPoint(this.range, point);
 };
 globeGeometry.globe.MeridianArc.prototype.extend = function(point) {
-  if (point < this.start) {
-    this.start = point;
-  }
-  if (point > this.end) {
-    this.end = point;
-  }
-  return this.range.includePoint(point);
+  var end, start;
+  start = point < this.start ? point : this.start;
+  end = point > this.end ? point : this.end;
+  return new globeGeometry.globe.MeridianArc(start, end);
 };
 globeGeometry.globe.MeridianArc.prototype.getCenter = function() {
   return(this.range.start + this.range.end) / 2;
@@ -2001,7 +1998,22 @@ globeGeometry.globe.ParallelArc.prototype.contains = function(lat) {
   }
 };
 globeGeometry.globe.ParallelArc.prototype.extend = function(lat) {
-  return false;
+  var end, start, testEnd, testStart;
+  if (this.contains(lat)) {
+    start = this.start;
+    end = this.end;
+  } else {
+    testStart = new globeGeometry.globe.ParallelArc(lat, this.end);
+    testEnd = new globeGeometry.globe.ParallelArc(this.start, lat);
+    if (testStart.getLength() >= testEnd.getLength()) {
+      start = this.start;
+      end = lat;
+    } else {
+      start = lat;
+      end = this.end;
+    }
+  }
+  return new globeGeometry.globe.ParallelArc(start, end);
 };
 globeGeometry.globe.ParallelArc.prototype.getCenter = function() {
   var center;
@@ -2020,6 +2032,13 @@ globeGeometry.globe.ParallelArc.prototype.intersects = function(other) {
 };
 globeGeometry.globe.ParallelArc.prototype.isEmpty = function() {
   return false;
+};
+globeGeometry.globe.ParallelArc.prototype.getLength = function() {
+  if (this.crossesDateMeridian()) {
+    return 360 - this.start + this.end;
+  } else {
+    return this.end - this.start;
+  }
 };
 goog.provide("globeGeometry.math");
 goog.require("goog.math");

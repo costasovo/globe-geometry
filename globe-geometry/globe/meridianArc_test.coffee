@@ -37,22 +37,22 @@ suite 'globeGeometry.globe.MeridianArc', ->
       arc = new MeridianArc 0, 2
 
       assert.isFalse arc.contains 3
-      arc.extend 3
-      assert.isTrue arc.contains 3
-      assert.equal arc.getStart(), 0
-      assert.equal arc.getEnd(), 3
+      arc2 = arc.extend 3
+      assert.isTrue arc2.contains 3
+      assert.equal arc2.getStart(), 0
+      assert.equal arc2.getEnd(), 3
 
       assert.isFalse arc.contains -2
-      arc.extend -2
-      assert.isTrue arc.contains -2
-      assert.equal arc.getStart(), -2
-      assert.equal arc.getEnd(), 3
+      arc2 = arc.extend -2
+      assert.isTrue arc2.contains -2
+      assert.equal arc2.getStart(), -2
+      assert.equal arc2.getEnd(), 2
 
       assert.isTrue arc.contains 1
-      arc.extend 1
-      assert.isTrue arc.contains 1
-      assert.equal arc.getStart(), -2
-      assert.equal arc.getEnd(), 3
+      arc2 = arc.extend 1
+      assert.isTrue arc2.contains 1
+      assert.equal arc2.getStart(), 0
+      assert.equal arc2.getEnd(), 2
 
   suite 'getCenter', ->
     test 'should work', ->
