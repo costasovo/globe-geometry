@@ -50,12 +50,26 @@ class globeGeometry.globe.ParallelArc
       return lat >= @start || lat <= @end
     else
       return lat >= @start && lat <= @end
+
   ###*
+    Extend the arc to minimize the length
     @param {number} lat
-    @return {boolean}
+    @return {globeGeometry.globe.ParallelArc}
   ###
   extend: (lat) ->
-    false
+    if @contains lat
+      start = @start
+      end = @end
+    else
+      testStart = new globeGeometry.globe.ParallelArc lat, @end
+      testEnd = new globeGeometry.globe.ParallelArc @start, lat
+      if testStart.getLength() >= testEnd.getLength()
+        start = @start
+        end = lat
+      else
+        start = lat
+        end = @end
+    return new globeGeometry.globe.ParallelArc start, end
 
   ###*
     @return {number}
@@ -83,3 +97,12 @@ class globeGeometry.globe.ParallelArc
   ###
   isEmpty: () ->
     false
+
+  ###*
+    @return {number}
+  ###
+  getLength: () ->
+    if @crossesDateMeridian()
+      return 360 - @start + @end
+    else
+      return @end - @start

@@ -152,3 +152,41 @@ suite 'globeGeometry.globe.ParallelArc', ->
         [-40, 160, 170, -150]
       ]
       testAcr inputs, false
+
+  suite 'getLength', ->
+    testAcr = (inputs) ->
+      for input in inputs
+        arc = new ParallelArc input[0], input[1]
+        assert.deepEqual arc.getLength(), input[2], input
+
+    test 'should work for non crossing date meridian', ->
+      inputs = [
+        [20, 35, 15]
+        [-20, 34, 54]
+      ]
+      testAcr inputs
+
+    test 'should work for crossing date meridian', ->
+      inputs = [
+        [160, -170, 30]
+        [-80, -160, 280]
+      ]
+      testAcr inputs
+
+  suite 'extend', ->
+    testAcr = (inputs) ->
+      for input in inputs
+        arc = new ParallelArc input[0], input[1]
+        extended = arc.extend input[2]
+        assert.deepEqual extended.getStart(), input[3], input
+        assert.deepEqual extended.getEnd(), input[4], input
+
+    test 'should work', ->
+      inputs = [
+        [20, 35, 40, 20, 40]
+        [-20, 34, 20, -20, 34]
+        [-20, 34, -30, -30, 34]
+        [160, -170, 140, 140, -170]
+        [-80, -160, -120, -80, -120]
+      ]
+      testAcr inputs
