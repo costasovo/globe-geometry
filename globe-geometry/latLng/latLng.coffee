@@ -70,8 +70,8 @@ class globeGeometry.LatLng
     @export
   ###
   toUrlValue: (precision = 6) ->
-    lat = globeGeometry.math.toFixed @getLat(), precision
-    lng = globeGeometry.math.toFixed @getLng(), precision
+    lat = globeGeometry.math.round @getLat(), precision
+    lng = globeGeometry.math.round @getLng(), precision
     return Number(lat) + ',' + Number(lng)
 
   ###*

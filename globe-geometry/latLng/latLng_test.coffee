@@ -36,7 +36,7 @@ suite 'globeGeometry.LatLng', ->
 
     test 'should work with default precision 6', ->
       latLng = new LatLng(1.123456789, -2.123456789)
-      assert.deepEqual latLng.toUrlValue(), '1.123456,-2.123456'
+      assert.deepEqual latLng.toUrlValue(), '1.123457,-2.123457'
 
     test 'should not add trailing zeros', ->
       latLng = new LatLng(1.12, -2.12)
