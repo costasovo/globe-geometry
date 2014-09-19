@@ -2577,6 +2577,28 @@ globeGeometry.LatLngBounds.prototype.toUrlValue = function(precision) {
   ne = goog.isDefAndNotNull(this.ne) ? this.ne : this.sw;
   return sw.toUrlValue(precision) + "," + ne.toUrlValue(precision);
 };
+globeGeometry.LatLngBounds.prototype.extend = function(point) {
+  var meridianArc, ne, parallelArc, sw;
+  if (goog.isDefAndNotNull(this.meridianArc)) {
+    meridianArc = this.meridianArc.extend(point.getLat());
+  }
+  if (goog.isDefAndNotNull(this.parallelArc)) {
+    parallelArc = this.parallelArc.extend(point.getLng());
+  }
+  if (goog.isDefAndNotNull(meridianArc) && goog.isDefAndNotNull(parallelArc)) {
+    sw = new globeGeometry.LatLng(meridianArc.getStart(), parallelArc.getStart());
+    ne = new globeGeometry.LatLng(meridianArc.getEnd(), parallelArc.getEnd());
+  } else {
+    if (goog.isDefAndNotNull(this.sw)) {
+      sw = this.sw;
+      ne = point;
+    } else {
+      sw = point;
+      ne = point;
+    }
+  }
+  return new globeGeometry.LatLngBounds(sw, ne);
+};
 goog.provide("globeGeometry.Size");
 globeGeometry.Size = function(width, height) {
   this.width = Number(width);
