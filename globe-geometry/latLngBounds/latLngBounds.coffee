@@ -1,5 +1,5 @@
 ###*
-  @fileoverview A LatLngBounds instance represents a rectangle in geographical coordinates.
+  @fileoverview A LatLngBounds instance represents a rectangle in geographical coordinates, including one that crosses the 180 degrees longitudinal meridian.
 ###
 
 goog.provide 'globeGeometry.LatLngBounds'

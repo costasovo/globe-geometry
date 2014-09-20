@@ -2599,6 +2599,19 @@ globeGeometry.LatLngBounds.prototype.extend = function(point) {
   }
   return new globeGeometry.LatLngBounds(sw, ne);
 };
+globeGeometry.LatLngBounds.prototype.union = function(other) {
+  var bounds, ne, sw;
+  bounds = new globeGeometry.LatLngBounds(this.getSouthWest(), this.getNorthEast());
+  sw = other.getSouthWest();
+  if (goog.isDefAndNotNull(sw)) {
+    bounds = bounds.extend(sw);
+  }
+  ne = other.getNorthEast();
+  if (goog.isDefAndNotNull(ne)) {
+    bounds = bounds.extend(ne);
+  }
+  return bounds;
+};
 goog.provide("globeGeometry.Size");
 globeGeometry.Size = function(width, height) {
   this.width = Number(width);
