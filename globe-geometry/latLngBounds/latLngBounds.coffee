@@ -154,3 +154,16 @@ class globeGeometry.LatLngBounds
       ne = point
 
     return new globeGeometry.LatLngBounds sw, ne
+
+  ###*
+    @param {globeGeometry.LatLngBounds} other
+    @return {globeGeometry.LatLngBounds}
+    @export
+  ###
+  union: (other) ->
+    bounds = new globeGeometry.LatLngBounds @getSouthWest(), @getNorthEast()
+    sw = other.getSouthWest()
+    bounds = bounds.extend sw if goog.isDefAndNotNull sw
+    ne = other.getNorthEast()
+    bounds = bounds.extend ne if goog.isDefAndNotNull ne
+    return bounds
