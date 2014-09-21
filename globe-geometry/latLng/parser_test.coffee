@@ -14,7 +14,17 @@ suite 'globeGeometry.latLng.Parser', ->
       ]
       for input in inputs
         latLng = Parser.parseDms input
-        assert.sameMembers latLng, [49.208972, 16.598305], 'Failed to parse ' + input
+        assert.sameMembers latLng, [49.208972, 16.598306], 'Failed to parse ' + input
+
+    test 'should work with inputs from all parts of globe', ->
+      inputs = [
+        ["51°28'11.8\"N 117°24'03.0\"W", [51.469944, -117.400833]]
+        ["23°56'34.0\"S 68°54'28.6\"W", [-23.942778, -68.907944]]
+        ["37°51'19.3\"S 145°01'46.3\"E", [-37.855361, 145.029528]]
+      ]
+      for input in inputs
+        latLng = Parser.parseDms input[0]
+        assert.sameMembers latLng, input[1], 'Failed to parse ' + input[0]
 
   suite 'parseDdm', ->
     test 'should work with various input formats', ->

@@ -118,4 +118,10 @@ class globeGeometry.latLng.Parser
     nums = str.split /[^0-9.,]+/
     nums.pop() if goog.array.peek(nums) == ''
     return null if nums.length != count
-    return goog.array.map nums, (num) -> goog.string.toNumber num
+    sign = 1
+    if goog.string.caseInsensitiveContains(str, 'W') || goog.string.caseInsensitiveContains(str, 'S')
+      sign = -1
+    nums = goog.array.map nums, (num) ->
+      num = goog.string.toNumber num
+      num = num*sign
+    return nums

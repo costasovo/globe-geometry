@@ -2140,7 +2140,7 @@ globeGeometry.latLng.Parser.prototype.parseDmsPart = function(dms) {
     return null;
   }
   deg = nums[0] + nums[1] / 60 + nums[2] / 3600;
-  return globeGeometry.math.toFixed(deg, 6);
+  return globeGeometry.math.round(deg, 6);
 };
 globeGeometry.latLng.Parser.prototype.parseDdmPart = function(ddm) {
   var deg, nums;
@@ -2149,7 +2149,7 @@ globeGeometry.latLng.Parser.prototype.parseDdmPart = function(ddm) {
     return null;
   }
   deg = nums[0] + nums[1] / 60;
-  return globeGeometry.math.toFixed(deg, 6);
+  return globeGeometry.math.round(deg, 6);
 };
 globeGeometry.latLng.Parser.prototype.parseDdPart = function(dd) {
   var nums;
@@ -2157,10 +2157,10 @@ globeGeometry.latLng.Parser.prototype.parseDdPart = function(dd) {
   if (!goog.isArray(nums)) {
     return null;
   }
-  return globeGeometry.math.toFixed(nums[0], 6);
+  return globeGeometry.math.round(nums[0], 6);
 };
 globeGeometry.latLng.Parser.prototype.getNumericParts = function(str, count) {
-  var nums;
+  var nums, sign;
   nums = str.split(/[^0-9.,]+/);
   if (goog.array.peek(nums) === "") {
     nums.pop();
@@ -2168,9 +2168,15 @@ globeGeometry.latLng.Parser.prototype.getNumericParts = function(str, count) {
   if (nums.length !== count) {
     return null;
   }
-  return goog.array.map(nums, function(num) {
-    return goog.string.toNumber(num);
+  sign = 1;
+  if (goog.string.caseInsensitiveContains(str, "W") || goog.string.caseInsensitiveContains(str, "S")) {
+    sign = -1;
+  }
+  nums = goog.array.map(nums, function(num) {
+    num = goog.string.toNumber(num);
+    return num = num * sign;
   });
+  return nums;
 };
 goog.provide("globeGeometry.Point");
 goog.require("globeGeometry.math");
