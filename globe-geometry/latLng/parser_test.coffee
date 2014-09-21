@@ -28,7 +28,7 @@ suite 'globeGeometry.latLng.Parser', ->
       ]
       for input in inputs
         latLng = Parser.parseDdm input
-        assert.sameMembers latLng, [32.306416, 122.614583], 'Failed to parse ' + input
+        assert.sameMembers latLng, [32.306417, 122.614583], 'Failed to parse ' + input
 
   suite 'parseDd', ->
     test 'should work with various input formats', ->
@@ -40,4 +40,4 @@ suite 'globeGeometry.latLng.Parser', ->
       ]
       for input in inputs
         latLng = Parser.parseDd input
-        assert.sameMembers latLng, [32.30642, 122.61458], 'Failed to parse ' + input
+        assert.sameMembers latLng, [32.30642, -122.61458], 'Failed to parse ' + input

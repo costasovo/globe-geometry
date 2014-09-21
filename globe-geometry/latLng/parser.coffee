@@ -85,7 +85,7 @@ class globeGeometry.latLng.Parser
     nums = @getNumericParts dms, 3
     return null if !goog.isArray nums
     deg = nums[0] + nums[1]/60 + nums[2]/3600
-    return globeGeometry.math.toFixed deg, 6
+    return globeGeometry.math.round deg, 6
 
   ###*
     @param {string} ddm
@@ -96,7 +96,7 @@ class globeGeometry.latLng.Parser
     nums = @getNumericParts ddm, 2
     return null if !goog.isArray nums
     deg = nums[0] + nums[1]/60
-    return globeGeometry.math.toFixed deg, 6
+    return globeGeometry.math.round deg, 6
 
   ###*
     @param {string} dd
@@ -106,7 +106,7 @@ class globeGeometry.latLng.Parser
   parseDdPart: (dd) ->
     nums = @getNumericParts dd, 1
     return null if !goog.isArray nums
-    return globeGeometry.math.toFixed nums[0], 6
+    return globeGeometry.math.round nums[0], 6
 
   ###*
     @param {string} str
