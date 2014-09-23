@@ -40,3 +40,22 @@ class globeGeometry.mercator
     x = Math.floor point.getX() / globeGeometry.mercator.TILE_SIZE
     y = Math.floor point.getY() / globeGeometry.mercator.TILE_SIZE
     return new globeGeometry.mercator.Tile x, y, zoomLevel
+
+  ###*
+    @param {globeGeometry.Point} point
+    @param {number} zoomLevel
+    @return {globeGeometry.LatLng}
+    @export
+    @see http://msdn.microsoft.com/en-us/library/bb259689.aspx
+  ###
+  @fromPointToLatLng: (point, zoomLevel) ->
+    canvasSize = globeGeometry.mercator.TILE_SIZE * Math.pow 2, zoomLevel
+    x = goog.math.clamp point.getX(), 0, canvasSize - 1
+    y = goog.math.clamp point.getY(), 0, canvasSize - 1
+
+    x = x / canvasSize - 0.5
+    y = 0.5 - y / canvasSize
+    lat = 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI
+    lng = 360 * x
+
+    return new globeGeometry.LatLng lat, lng

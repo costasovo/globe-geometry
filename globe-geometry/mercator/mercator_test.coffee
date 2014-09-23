@@ -5,6 +5,7 @@ suite 'globeGeometry.mercator', ->
 
   Mercator = globeGeometry.mercator
   LatLng = globeGeometry.LatLng
+  Point = globeGeometry.Point
 
   suite 'fromLatLngToTile', ->
     test 'should work for 0,0', ->
@@ -16,3 +17,23 @@ suite 'globeGeometry.mercator', ->
       assert.equal tile.getX(), 4
       assert.equal tile.getY(), 4
       assert.equal tile.getZ(), 3
+
+  suite 'fromLatLngToPoint', ->
+    test 'should work for 0,0', ->
+      point = new LatLng 0, 0
+
+      point = Mercator.fromLatLngToPoint point, 3
+
+      assert.instanceOf point, globeGeometry.Point
+      assert.equal point.getX(), 1024
+      assert.equal point.getY(), 1024
+
+  suite 'fromPointToLatLng', ->
+    test 'should work for 1024,1024 in zoom 3', ->
+      point = new Point 1024, 1024
+
+      latLng = Mercator.fromPointToLatLng point, 3
+
+      assert.instanceOf latLng, globeGeometry.LatLng
+      assert.equal latLng.getLat(), 0
+      assert.equal latLng.getLng(), 0

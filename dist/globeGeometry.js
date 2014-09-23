@@ -2213,6 +2213,17 @@ globeGeometry.mercator.fromLatLngToTile = function(latLng, zoomLevel) {
   y = Math.floor(point.getY() / globeGeometry.mercator.TILE_SIZE);
   return new globeGeometry.mercator.Tile(x, y, zoomLevel);
 };
+globeGeometry.mercator.fromPointToLatLng = function(point, zoomLevel) {
+  var canvasSize, lat, lng, x, y;
+  canvasSize = globeGeometry.mercator.TILE_SIZE * Math.pow(2, zoomLevel);
+  x = goog.math.clamp(point.getX(), 0, canvasSize - 1);
+  y = goog.math.clamp(point.getY(), 0, canvasSize - 1);
+  x = x / canvasSize - 0.5;
+  y = 0.5 - y / canvasSize;
+  lat = 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI;
+  lng = 360 * x;
+  return new globeGeometry.LatLng(lat, lng);
+};
 goog.provide("globeGeometry.quadKey");
 goog.require("globeGeometry.mercator");
 globeGeometry.quadKey = function() {
