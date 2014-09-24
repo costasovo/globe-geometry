@@ -2224,6 +2224,18 @@ globeGeometry.mercator.fromPointToLatLng = function(point, zoomLevel) {
   lng = 360 * x;
   return new globeGeometry.LatLng(lat, lng);
 };
+globeGeometry.mercator.fromTileToLatLngBounds = function(tile) {
+  var ne, nePoint, neX, neY, sw, swPoint, swX, swY;
+  swX = tile.getX() * globeGeometry.mercator.TILE_SIZE;
+  swY = tile.getX() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1;
+  neX = tile.getY() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1;
+  neY = tile.getY() * globeGeometry.mercator.TILE_SIZE;
+  swPoint = new globeGeometry.Point(swX, swY);
+  nePoint = new globeGeometry.Point(neX, neY);
+  sw = globeGeometry.mercator.fromPointToLatLng(swPoint, tile.getZ());
+  ne = globeGeometry.mercator.fromPointToLatLng(nePoint, tile.getZ());
+  return new globeGeometry.LatLngBounds(sw, ne);
+};
 goog.provide("globeGeometry.quadKey");
 goog.require("globeGeometry.mercator");
 globeGeometry.quadKey = function() {
