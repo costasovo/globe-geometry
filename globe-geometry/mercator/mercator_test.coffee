@@ -1,5 +1,6 @@
 goog.require 'globeGeometry.LatLng'
 goog.require 'globeGeometry.mercator.Tile'
+goog.require 'globeGeometry.LatLngBounds'
 
 suite 'globeGeometry.mercator', ->
 
@@ -39,8 +40,12 @@ suite 'globeGeometry.mercator', ->
       assert.equal latLng.getLng(), 0
 
   suite 'fromTileToLatLngBounds', ->
-    test 'should work for 50,0 in zoom 13', ->
-      latLng = new LatLng 50, 0
+    test 'should work for 50,1 in zoom 13', ->
+      latLng = new LatLng 50, 1
       tile = Mercator.fromLatLngToTile latLng, 13
       bounds = Mercator.fromTileToLatLngBounds tile
-      console.log bounds
+      assert.instanceOf bounds, globeGeometry.LatLngBounds
+      assert.equal bounds.getSouthWest().getLat(), 49.97959814983682
+      assert.equal bounds.getSouthWest().getLng(), 0.966796875
+      assert.equal bounds.getNorthEast().getLat(), 50.00773901463686
+      assert.equal bounds.getNorthEast().getLng(), 1.0105705261230469
