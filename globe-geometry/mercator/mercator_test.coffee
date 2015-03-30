@@ -37,3 +37,10 @@ suite 'globeGeometry.mercator', ->
       assert.instanceOf latLng, globeGeometry.LatLng
       assert.equal latLng.getLat(), 0
       assert.equal latLng.getLng(), 0
+
+  suite 'fromTileToLatLngBounds', ->
+    test 'should work for 50,0 in zoom 13', ->
+      latLng = new LatLng 50, 0
+      tile = Mercator.fromLatLngToTile latLng, 13
+      bounds = Mercator.fromTileToLatLngBounds tile
+      console.log bounds

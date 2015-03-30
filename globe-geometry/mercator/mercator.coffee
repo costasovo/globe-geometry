@@ -5,6 +5,7 @@
 goog.provide 'globeGeometry.mercator'
 
 goog.require 'globeGeometry.Point'
+goog.require 'globeGeometry.LatLngBounds'
 
 class globeGeometry.mercator
 
@@ -67,8 +68,8 @@ class globeGeometry.mercator
   ###
   @fromTileToLatLngBounds: (tile) ->
     swX = tile.getX() * globeGeometry.mercator.TILE_SIZE
-    swY = tile.getX() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1
-    neX = tile.getY() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1
+    swY = tile.getY() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1
+    neX = tile.getX() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1
     neY = tile.getY() * globeGeometry.mercator.TILE_SIZE
     swPoint = new globeGeometry.Point swX, swY
     nePoint = new globeGeometry.Point neX, neY
