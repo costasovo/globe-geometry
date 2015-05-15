@@ -4,6 +4,8 @@
 
 goog.provide 'globeGeometry.mercator'
 
+goog.require 'globeGeometry.LatLng'
+goog.require 'globeGeometry.LatLngBounds'
 goog.require 'globeGeometry.Point'
 
 class globeGeometry.mercator
