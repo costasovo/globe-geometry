@@ -4,7 +4,6 @@
 globeGeometry.mercator = globeGeometry.mercator || {}
 goog.provide 'globeGeometry.mercator.Tile'
 
-goog.require 'globeGeometry.mercator'
 goog.require 'globeGeometry.math'
 
 class globeGeometry.mercator.Tile
