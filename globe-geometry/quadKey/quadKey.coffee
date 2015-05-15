@@ -5,6 +5,7 @@
 goog.provide 'globeGeometry.quadKey'
 
 goog.require 'globeGeometry.mercator'
+goog.require 'globeGeometry.mercator.Tile'
 
 class globeGeometry.quadKey
 
