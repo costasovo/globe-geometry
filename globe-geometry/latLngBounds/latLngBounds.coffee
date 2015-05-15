@@ -7,7 +7,6 @@ goog.provide 'globeGeometry.LatLngBounds'
 goog.require 'globeGeometry.LatLng'
 goog.require 'globeGeometry.globe.MeridianArc'
 goog.require 'globeGeometry.globe.ParallelArc'
-goog.require 'globeGeometry.LatLng'
 
 class globeGeometry.LatLngBounds
 

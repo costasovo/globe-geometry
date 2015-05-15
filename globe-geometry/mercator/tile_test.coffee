@@ -25,14 +25,6 @@ suite 'globeGeometry.mercator.Tile', ->
       assert.isFalse tile.equals(tile2), "Tile does not equal different tile"
       assert.isFalse tile2.equals(tile), "Tile does not equal different tile"
 
-  suite 'toQuadKey', ->
-    test 'should work', ->
-      tile = new Tile 3, 5, 3
-
-      quadKey = tile.toQuadKey()
-
-      assert.equal quadKey, '213'
-
   suite 'createInstance', ->
     test 'should work', ->
       quadKey = '213'

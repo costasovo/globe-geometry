@@ -2500,150 +2500,9 @@ globeGeometry.latLng.Parser.prototype.getNumericParts = function(str, count) {
   });
   return nums;
 };
-goog.provide("globeGeometry.Point");
-goog.require("globeGeometry.math");
-globeGeometry.Point = function(x, y) {
-  this.x = Number(x);
-  this.y = Number(y);
-};
-globeGeometry.Point.prototype.getX = function() {
-  return this.x;
-};
-globeGeometry.Point.prototype.getY = function() {
-  return this.y;
-};
-globeGeometry.Point.prototype.equals = function(point) {
-  return this.x === point.getX() && this.y === point.getY();
-};
-goog.provide("globeGeometry.mercator");
-goog.require("globeGeometry.Point");
-globeGeometry.mercator = function() {
-};
-globeGeometry.mercator.TILE_SIZE = 256;
-globeGeometry.mercator.fromLatLngToPoint = function(latLng, zoomLevel) {
-  var canvasSize, sinLat, x, y;
-  canvasSize = globeGeometry.mercator.TILE_SIZE * Math.pow(2, zoomLevel);
-  sinLat = Math.sin(latLng.getLat() * Math.PI / 180);
-  x = (latLng.getLng() + 180) / 360 * canvasSize;
-  y = (.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * canvasSize;
-  return new globeGeometry.Point(x, y);
-};
-globeGeometry.mercator.fromLatLngToTile = function(latLng, zoomLevel) {
-  var point, x, y;
-  point = globeGeometry.mercator.fromLatLngToPoint(latLng, zoomLevel);
-  x = Math.floor(point.getX() / globeGeometry.mercator.TILE_SIZE);
-  y = Math.floor(point.getY() / globeGeometry.mercator.TILE_SIZE);
-  return new globeGeometry.mercator.Tile(x, y, zoomLevel);
-};
-globeGeometry.mercator.fromPointToLatLng = function(point, zoomLevel) {
-  var canvasSize, lat, lng, x, y;
-  canvasSize = globeGeometry.mercator.TILE_SIZE * Math.pow(2, zoomLevel);
-  x = goog.math.clamp(point.getX(), 0, canvasSize - 1);
-  y = goog.math.clamp(point.getY(), 0, canvasSize - 1);
-  x = x / canvasSize - .5;
-  y = .5 - y / canvasSize;
-  lat = 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI;
-  lng = 360 * x;
-  return new globeGeometry.LatLng(lat, lng);
-};
-globeGeometry.mercator.fromTileToLatLngBounds = function(tile) {
-  var ne, nePoint, neX, neY, sw, swPoint, swX, swY;
-  swX = tile.getX() * globeGeometry.mercator.TILE_SIZE;
-  swY = tile.getY() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1;
-  neX = tile.getX() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1;
-  neY = tile.getY() * globeGeometry.mercator.TILE_SIZE;
-  swPoint = new globeGeometry.Point(swX, swY);
-  nePoint = new globeGeometry.Point(neX, neY);
-  sw = globeGeometry.mercator.fromPointToLatLng(swPoint, tile.getZ());
-  ne = globeGeometry.mercator.fromPointToLatLng(nePoint, tile.getZ());
-  return new globeGeometry.LatLngBounds(sw, ne);
-};
-goog.provide("globeGeometry.quadKey");
-goog.require("globeGeometry.mercator");
-globeGeometry.quadKey = function() {
-};
-globeGeometry.quadKey.fromLatLngToQuadKey = function(latLng, zoomLevel) {
-  var tile;
-  tile = globeGeometry.mercator.fromLatLngToTile(latLng, zoomLevel);
-  return globeGeometry.quadKey.fromTileToQuadKey(tile);
-};
-globeGeometry.quadKey.fromTileToQuadKey = function(tile) {
-  var digit, i, key, mask, _i, _ref;
-  key = "";
-  for (i = _i = _ref = tile.getZ();_ref <= 1 ? _i <= 1 : _i >= 1;i = _ref <= 1 ? ++_i : --_i) {
-    digit = 0;
-    mask = 1 << i - 1;
-    if ((tile.getX() & mask) !== 0) {
-      digit += 1;
-    }
-    if ((tile.getY() & mask) !== 0) {
-      digit += 2;
-    }
-    key += digit;
-  }
-  return key;
-};
-globeGeometry.quadKey.fromQuadKeyToTile = function(key) {
-  var i, mask, x, y, zoomLevel, _i;
-  x = y = 0;
-  zoomLevel = key.length;
-  for (i = _i = zoomLevel;zoomLevel <= 1 ? _i <= 1 : _i >= 1;i = zoomLevel <= 1 ? ++_i : --_i) {
-    mask = 1 << i - 1;
-    switch(key[zoomLevel - i]) {
-      case "0":
-        break;
-      case "1":
-        x |= mask;
-        break;
-      case "2":
-        y |= mask;
-        break;
-      case "3":
-        x |= mask;
-        y |= mask;
-        break;
-      default:
-        throw new Error("Invalid QuadKey digit sequence.");;
-    }
-  }
-  return new globeGeometry.mercator.Tile(x, y, zoomLevel);
-};
-goog.provide("globeGeometry.mercator.Tile");
-goog.require("globeGeometry.mercator");
-goog.require("globeGeometry.math");
-goog.require("globeGeometry.quadKey");
-globeGeometry.mercator.Tile = function(x, y, z) {
-  var max;
-  x = Math.round(Math.abs(Number(x)));
-  y = Math.round(Math.abs(Number(y)));
-  this.z = Math.round(Math.abs(Number(z)));
-  max = Math.pow(2, this.z) - 1;
-  this.x = goog.math.clamp(x, 0, max);
-  this.y = goog.math.clamp(y, 0, max);
-};
-globeGeometry.mercator.Tile.createInstance = function(quadKey) {
-  return globeGeometry.quadKey.fromQuadKeyToTile(quadKey);
-};
-globeGeometry.mercator.Tile.prototype.getX = function() {
-  return this.x;
-};
-globeGeometry.mercator.Tile.prototype.getY = function() {
-  return this.y;
-};
-globeGeometry.mercator.Tile.prototype.getZ = function() {
-  return this.z;
-};
-globeGeometry.mercator.Tile.prototype.equals = function(tile) {
-  return this.x === tile.getX() && this.y === tile.getY() && this.z === tile.getZ();
-};
-globeGeometry.mercator.Tile.prototype.toQuadKey = function() {
-  return globeGeometry.quadKey.fromTileToQuadKey(this);
-};
 goog.provide("globeGeometry.LatLng");
 goog.require("globeGeometry.latLng.Parser");
 goog.require("globeGeometry.math");
-goog.require("globeGeometry.mercator.Tile");
-goog.require("globeGeometry.quadKey");
 goog.require("goog.math");
 globeGeometry.LatLng = function(lat, lng) {
   this.lat = goog.math.clamp(Number(lat), -90, 90);
@@ -2734,9 +2593,6 @@ globeGeometry.LatLng.prototype.toDms = function(separator, precision) {
   latLetter = this.getLat() < 0 ? "S" : "N";
   lngLetter = this.getLng() < 0 ? "E" : "W";
   return dLat + "\u00b0" + mLat + "'" + sLat + '"' + latLetter + separator + dLng + "\u00b0" + mLng + "'" + sLng + '"' + lngLetter;
-};
-globeGeometry.LatLng.prototype.toQuadKey = function(zoomLevel) {
-  return globeGeometry.quadKey.fromLatLngToQuadKey(this, zoomLevel);
 };
 globeGeometry.LatLng.prototype.equals = function(other) {
   if (!goog.isDefAndNotNull(other)) {
@@ -2832,7 +2688,6 @@ goog.provide("globeGeometry.LatLngBounds");
 goog.require("globeGeometry.LatLng");
 goog.require("globeGeometry.globe.MeridianArc");
 goog.require("globeGeometry.globe.ParallelArc");
-goog.require("globeGeometry.LatLng");
 globeGeometry.LatLngBounds = function(sw, ne) {
   this.sw = sw;
   this.ne = ne;
@@ -2962,6 +2817,144 @@ globeGeometry.LatLngBounds.prototype.union = function(other) {
     bounds = bounds.extend(ne);
   }
   return bounds;
+};
+goog.provide("globeGeometry.Point");
+goog.require("globeGeometry.math");
+globeGeometry.Point = function(x, y) {
+  this.x = Number(x);
+  this.y = Number(y);
+};
+globeGeometry.Point.prototype.getX = function() {
+  return this.x;
+};
+globeGeometry.Point.prototype.getY = function() {
+  return this.y;
+};
+globeGeometry.Point.prototype.equals = function(point) {
+  return this.x === point.getX() && this.y === point.getY();
+};
+goog.provide("globeGeometry.mercator");
+goog.require("globeGeometry.LatLng");
+goog.require("globeGeometry.LatLngBounds");
+goog.require("globeGeometry.Point");
+globeGeometry.mercator = function() {
+};
+globeGeometry.mercator.TILE_SIZE = 256;
+globeGeometry.mercator.fromLatLngToPoint = function(latLng, zoomLevel) {
+  var canvasSize, sinLat, x, y;
+  canvasSize = globeGeometry.mercator.TILE_SIZE * Math.pow(2, zoomLevel);
+  sinLat = Math.sin(latLng.getLat() * Math.PI / 180);
+  x = (latLng.getLng() + 180) / 360 * canvasSize;
+  y = (.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * canvasSize;
+  return new globeGeometry.Point(x, y);
+};
+globeGeometry.mercator.fromLatLngToTile = function(latLng, zoomLevel) {
+  var point, x, y;
+  point = globeGeometry.mercator.fromLatLngToPoint(latLng, zoomLevel);
+  x = Math.floor(point.getX() / globeGeometry.mercator.TILE_SIZE);
+  y = Math.floor(point.getY() / globeGeometry.mercator.TILE_SIZE);
+  return new globeGeometry.mercator.Tile(x, y, zoomLevel);
+};
+globeGeometry.mercator.fromPointToLatLng = function(point, zoomLevel) {
+  var canvasSize, lat, lng, x, y;
+  canvasSize = globeGeometry.mercator.TILE_SIZE * Math.pow(2, zoomLevel);
+  x = goog.math.clamp(point.getX(), 0, canvasSize - 1);
+  y = goog.math.clamp(point.getY(), 0, canvasSize - 1);
+  x = x / canvasSize - .5;
+  y = .5 - y / canvasSize;
+  lat = 90 - 360 * Math.atan(Math.exp(-y * 2 * Math.PI)) / Math.PI;
+  lng = 360 * x;
+  return new globeGeometry.LatLng(lat, lng);
+};
+globeGeometry.mercator.fromTileToLatLngBounds = function(tile) {
+  var ne, nePoint, neX, neY, sw, swPoint, swX, swY;
+  swX = tile.getX() * globeGeometry.mercator.TILE_SIZE;
+  swY = tile.getY() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1;
+  neX = tile.getX() * globeGeometry.mercator.TILE_SIZE + globeGeometry.mercator.TILE_SIZE - 1;
+  neY = tile.getY() * globeGeometry.mercator.TILE_SIZE;
+  swPoint = new globeGeometry.Point(swX, swY);
+  nePoint = new globeGeometry.Point(neX, neY);
+  sw = globeGeometry.mercator.fromPointToLatLng(swPoint, tile.getZ());
+  ne = globeGeometry.mercator.fromPointToLatLng(nePoint, tile.getZ());
+  return new globeGeometry.LatLngBounds(sw, ne);
+};
+globeGeometry.mercator = globeGeometry.mercator || {};
+goog.provide("globeGeometry.mercator.Tile");
+goog.require("globeGeometry.mercator");
+goog.require("globeGeometry.math");
+globeGeometry.mercator.Tile = function(x, y, z) {
+  var max;
+  x = Math.round(Math.abs(Number(x)));
+  y = Math.round(Math.abs(Number(y)));
+  this.z = Math.round(Math.abs(Number(z)));
+  max = Math.pow(2, this.z) - 1;
+  this.x = goog.math.clamp(x, 0, max);
+  this.y = goog.math.clamp(y, 0, max);
+};
+globeGeometry.mercator.Tile.createInstance = function(quadKey) {
+  return globeGeometry.quadKey.fromQuadKeyToTile(quadKey);
+};
+globeGeometry.mercator.Tile.prototype.getX = function() {
+  return this.x;
+};
+globeGeometry.mercator.Tile.prototype.getY = function() {
+  return this.y;
+};
+globeGeometry.mercator.Tile.prototype.getZ = function() {
+  return this.z;
+};
+globeGeometry.mercator.Tile.prototype.equals = function(tile) {
+  return this.x === tile.getX() && this.y === tile.getY() && this.z === tile.getZ();
+};
+goog.provide("globeGeometry.quadKey");
+goog.require("globeGeometry.mercator");
+globeGeometry.quadKey = function() {
+};
+globeGeometry.quadKey.fromLatLngToQuadKey = function(latLng, zoomLevel) {
+  var tile;
+  tile = globeGeometry.mercator.fromLatLngToTile(latLng, zoomLevel);
+  return globeGeometry.quadKey.fromTileToQuadKey(tile);
+};
+globeGeometry.quadKey.fromTileToQuadKey = function(tile) {
+  var digit, i, key, mask, _i, _ref;
+  key = "";
+  for (i = _i = _ref = tile.getZ();_ref <= 1 ? _i <= 1 : _i >= 1;i = _ref <= 1 ? ++_i : --_i) {
+    digit = 0;
+    mask = 1 << i - 1;
+    if ((tile.getX() & mask) !== 0) {
+      digit += 1;
+    }
+    if ((tile.getY() & mask) !== 0) {
+      digit += 2;
+    }
+    key += digit;
+  }
+  return key;
+};
+globeGeometry.quadKey.fromQuadKeyToTile = function(key) {
+  var i, mask, x, y, zoomLevel, _i;
+  x = y = 0;
+  zoomLevel = key.length;
+  for (i = _i = zoomLevel;zoomLevel <= 1 ? _i <= 1 : _i >= 1;i = zoomLevel <= 1 ? ++_i : --_i) {
+    mask = 1 << i - 1;
+    switch(key[zoomLevel - i]) {
+      case "0":
+        break;
+      case "1":
+        x |= mask;
+        break;
+      case "2":
+        y |= mask;
+        break;
+      case "3":
+        x |= mask;
+        y |= mask;
+        break;
+      default:
+        throw new Error("Invalid QuadKey digit sequence.");;
+    }
+  }
+  return new globeGeometry.mercator.Tile(x, y, zoomLevel);
 };
 goog.provide("globeGeometry.Size");
 globeGeometry.Size = function(width, height) {
