@@ -1,12 +1,11 @@
 ###*
   @fileoverview Tile in Mercator projection. Defined by x, y coordinate and zoom level
 ###
-globeGeometry.mercator = globeGeometry.mercator || {}
-goog.provide 'globeGeometry.mercator.Tile'
+goog.provide 'globeGeometry.MercatorTile'
 
 goog.require 'globeGeometry.math'
 
-class globeGeometry.mercator.Tile
+class globeGeometry.MercatorTile
 
   ###*
     @param {number} x
@@ -27,7 +26,7 @@ class globeGeometry.mercator.Tile
   ###*
     Factory for creating Tile instances from quadKey
     @param {string} quadKey
-    @return {globeGeometry.mercator.Tile}
+    @return {globeGeometry.MercatorTile}
     @export
   ###
   @createInstance: (quadKey) ->
@@ -52,7 +51,7 @@ class globeGeometry.mercator.Tile
   getZ: () -> return @z
 
   ###*
-    @param {globeGeometry.mercator.Tile} tile
+    @param {globeGeometry.MercatorTile} tile
     @return {boolean}
     @export
   ###

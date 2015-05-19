@@ -1,8 +1,8 @@
-goog.require 'globeGeometry.mercator.Tile'
+goog.require 'globeGeometry.MercatorTile'
 
-suite 'globeGeometry.mercator.Tile', ->
+suite 'globeGeometry.MercatorTile', ->
 
-  Tile = globeGeometry.mercator.Tile
+  Tile = globeGeometry.MercatorTile
 
   suite 'constructor', ->
     test 'should clamp input', ->

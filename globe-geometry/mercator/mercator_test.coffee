@@ -1,5 +1,5 @@
 goog.require 'globeGeometry.LatLng'
-goog.require 'globeGeometry.mercator.Tile'
+goog.require 'globeGeometry.MercatorTile'
 goog.require 'globeGeometry.LatLngBounds'
 
 suite 'globeGeometry.mercator', ->
@@ -14,7 +14,7 @@ suite 'globeGeometry.mercator', ->
 
       tile = Mercator.fromLatLngToTile latLng, 3
 
-      assert.instanceOf tile, globeGeometry.mercator.Tile
+      assert.instanceOf tile, globeGeometry.MercatorTile
       assert.equal tile.getX(), 4
       assert.equal tile.getY(), 4
       assert.equal tile.getZ(), 3

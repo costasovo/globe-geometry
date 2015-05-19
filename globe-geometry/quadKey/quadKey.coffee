@@ -5,7 +5,7 @@
 goog.provide 'globeGeometry.quadKey'
 
 goog.require 'globeGeometry.mercator'
-goog.require 'globeGeometry.mercator.Tile'
+goog.require 'globeGeometry.MercatorTile'
 
 class globeGeometry.quadKey
 
@@ -21,7 +21,7 @@ class globeGeometry.quadKey
     return globeGeometry.quadKey.fromTileToQuadKey tile
 
   ###*
-    @param {globeGeometry.mercator.Tile} tile
+    @param {globeGeometry.MercatorTile} tile
     @return {string}
     @export
     @see http://msdn.microsoft.com/en-us/library/bb259689.aspx
@@ -38,7 +38,7 @@ class globeGeometry.quadKey
 
   ###*
     @param {string} key
-    @return {globeGeometry.mercator.Tile}
+    @return {globeGeometry.MercatorTile}
     @export
     @see http://msdn.microsoft.com/en-us/library/bb259689.aspx
   ###
@@ -55,5 +55,5 @@ class globeGeometry.quadKey
           x |= mask
           y |= mask
         else throw new Error 'Invalid QuadKey digit sequence.'
-    return new globeGeometry.mercator.Tile x, y, zoomLevel
+    return new globeGeometry.MercatorTile x, y, zoomLevel
 
