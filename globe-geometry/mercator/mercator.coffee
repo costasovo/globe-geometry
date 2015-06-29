@@ -78,3 +78,30 @@ class globeGeometry.mercator
     sw = globeGeometry.mercator.fromPointToLatLng swPoint, tile.getZ()
     ne = globeGeometry.mercator.fromPointToLatLng nePoint, tile.getZ()
     return new globeGeometry.LatLngBounds sw, ne
+
+  ###*
+    @param {globeGeometry.LatLngBounds} bounds
+    @param {number} zoomLevel
+    @return {globeGeometry.LatLngBounds}
+    @export
+  ###
+  @zoomOutBounds: (bounds, zoomLevel) ->
+    ne = bounds.getNorthEast()
+    sw = bounds.getSouthWest()
+
+    if !goog.isDef(sw) || !goog.isDef(ne)
+      return null
+
+    swPoint = globeGeometry.mercator.fromLatLngToPoint sw, zoomLevel
+    nePoint = globeGeometry.mercator.fromLatLngToPoint ne, zoomLevel
+
+    diffX = Math.abs(swPoint.getX() - nePoint.getX())
+    diffY = Math.abs(swPoint.getY() - nePoint.getY())
+
+    zoomedSwPoint = new globeGeometry.Point swPoint.getX() - (diffX/2), swPoint.getY() + (diffY/2) 
+    zoomedNePoint = new globeGeometry.Point nePoint.getX() + (diffX/2), nePoint.getY() - (diffY/2) 
+
+    sw = globeGeometry.mercator.fromPointToLatLng zoomedSwPoint, zoomLevel
+    ne = globeGeometry.mercator.fromPointToLatLng zoomedNePoint, zoomLevel 
+
+    return new globeGeometry.LatLngBounds sw, ne

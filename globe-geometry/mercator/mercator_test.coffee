@@ -49,3 +49,15 @@ suite 'globeGeometry.mercator', ->
       assert.equal bounds.getSouthWest().getLng(), 0.966796875
       assert.equal bounds.getNorthEast().getLat(), 50.00773901463686
       assert.equal bounds.getNorthEast().getLng(), 1.0105705261230469
+
+  suite 'zoomOutBounds', ->
+    test 'should set new bounds properly', ->
+      sw = new LatLng 0,0
+      ne = new LatLng 20,20
+      bounds = new globeGeometry.LatLngBounds sw, ne
+      zoomedBounds = Mercator.zoomOutBounds bounds, 2
+
+      assert.equal Math.round(zoomedBounds.getSouthWest().getLat()), -10
+      assert.equal Math.round(zoomedBounds.getSouthWest().getLng()), -10
+      assert.equal Math.round(zoomedBounds.getNorthEast().getLat()), 29
+      assert.equal Math.round(zoomedBounds.getNorthEast().getLng()), 30
