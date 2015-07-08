@@ -2878,7 +2878,7 @@ globeGeometry.mercator.fromLatLngToTile = function(latLng, zoomLevel) {
   x = point.getX() / globeGeometry.mercator.TILE_SIZE;
   x = Math.floor(x);
   y = point.getY() / globeGeometry.mercator.TILE_SIZE;
-  y = latLng.getLng() < 0 ? Math.ceil(y) : Math.floor(y);
+  y = latLng.getLng() < 0 ? Math.round(y) : Math.floor(y);
   return new globeGeometry.MercatorTile(x, y, zoomLevel);
 };
 globeGeometry.mercator.fromPointToLatLng = function(point, zoomLevel) {

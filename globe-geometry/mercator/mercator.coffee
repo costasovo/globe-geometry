@@ -43,7 +43,7 @@ class globeGeometry.mercator
     x = point.getX() / globeGeometry.mercator.TILE_SIZE
     x = Math.floor x
     y = point.getY() / globeGeometry.mercator.TILE_SIZE
-    y = if latLng.getLng() < 0 then Math.ceil y else Math.floor y
+    y = if latLng.getLng() < 0 then Math.round y else Math.floor y
     return new globeGeometry.MercatorTile x, y, zoomLevel
 
   ###*
