@@ -2829,9 +2829,6 @@ globeGeometry.MercatorTile = function(x, y, z) {
   this.x = goog.math.clamp(x, 0, max);
   this.y = goog.math.clamp(y, 0, max);
 };
-globeGeometry.MercatorTile.createInstance = function(quadKey) {
-  return globeGeometry.quadKey.fromQuadKeyToTile(quadKey);
-};
 globeGeometry.MercatorTile.prototype.getX = function() {
   return this.x;
 };
@@ -2878,8 +2875,10 @@ globeGeometry.mercator.fromLatLngToPoint = function(latLng, zoomLevel) {
 globeGeometry.mercator.fromLatLngToTile = function(latLng, zoomLevel) {
   var point, x, y;
   point = globeGeometry.mercator.fromLatLngToPoint(latLng, zoomLevel);
-  x = Math.floor(point.getX() / globeGeometry.mercator.TILE_SIZE);
-  y = Math.floor(point.getY() / globeGeometry.mercator.TILE_SIZE);
+  x = point.getX() / globeGeometry.mercator.TILE_SIZE;
+  x = Math.floor(x);
+  y = point.getY() / globeGeometry.mercator.TILE_SIZE;
+  y = latLng.getLng() < 0 ? Math.ceil(y) : Math.floor(y);
   return new globeGeometry.MercatorTile(x, y, zoomLevel);
 };
 globeGeometry.mercator.fromPointToLatLng = function(point, zoomLevel) {

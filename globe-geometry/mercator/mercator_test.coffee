@@ -9,55 +9,63 @@ suite 'globeGeometry.mercator', ->
   Point = globeGeometry.Point
 
   suite 'fromLatLngToTile', ->
-    test 'should work for 0,0', ->
-      latLng = new LatLng 0, 0
+    # test 'should work for 0,0', ->
+    #   latLng = new LatLng 0, 0
 
-      tile = Mercator.fromLatLngToTile latLng, 3
+    #   tile = Mercator.fromLatLngToTile latLng, 3
 
-      assert.instanceOf tile, globeGeometry.MercatorTile
-      assert.equal tile.getX(), 4
-      assert.equal tile.getY(), 4
-      assert.equal tile.getZ(), 3
+    #   assert.instanceOf tile, globeGeometry.MercatorTile
+    #   assert.equal tile.getX(), 4
+    #   assert.equal tile.getY(), 4
+    #   assert.equal tile.getZ(), 3
+    test 'should work properly with negative values', ->
+        latLng = new LatLng -40.90071485801472, -60.629589843750004
+        tile = Mercator.fromLatLngToTile latLng, 4
 
-  suite 'fromLatLngToPoint', ->
-    test 'should work for 0,0', ->
-      point = new LatLng 0, 0
+        assert.instanceOf tile, globeGeometry.MercatorTile
+        assert.equal tile.getX(), 5
+        assert.equal tile.getY(), 10
+        assert.equal tile.getZ(), 4
 
-      point = Mercator.fromLatLngToPoint point, 3
+  # suite 'fromLatLngToPoint', ->
+  #   test 'should work for 0,0', ->
+  #     point = new LatLng 0, 0
 
-      assert.instanceOf point, globeGeometry.Point
-      assert.equal point.getX(), 1024
-      assert.equal point.getY(), 1024
+  #     point = Mercator.fromLatLngToPoint point, 3
 
-  suite 'fromPointToLatLng', ->
-    test 'should work for 1024,1024 in zoom 3', ->
-      point = new Point 1024, 1024
+  #     assert.instanceOf point, globeGeometry.Point
+  #     assert.equal point.getX(), 1024
+  #     assert.equal point.getY(), 1024
 
-      latLng = Mercator.fromPointToLatLng point, 3
+  # suite 'fromPointToLatLng', ->
+  #   test 'should work for 1024,1024 in zoom 3', ->
+  #     point = new Point 1024, 1024
 
-      assert.instanceOf latLng, globeGeometry.LatLng
-      assert.equal latLng.getLat(), 0
-      assert.equal latLng.getLng(), 0
+  #     latLng = Mercator.fromPointToLatLng point, 3
 
-  suite 'fromTileToLatLngBounds', ->
-    test 'should work for 50,1 in zoom 13', ->
-      latLng = new LatLng 50, 1
-      tile = Mercator.fromLatLngToTile latLng, 13
-      bounds = Mercator.fromTileToLatLngBounds tile
-      assert.instanceOf bounds, globeGeometry.LatLngBounds
-      assert.equal bounds.getSouthWest().getLat(), 49.97959814983682
-      assert.equal bounds.getSouthWest().getLng(), 0.966796875
-      assert.equal bounds.getNorthEast().getLat(), 50.00773901463686
-      assert.equal bounds.getNorthEast().getLng(), 1.0105705261230469
+  #     assert.instanceOf latLng, globeGeometry.LatLng
+  #     assert.equal latLng.getLat(), 0
+  #     assert.equal latLng.getLng(), 0
 
-  suite 'zoomOutBounds', ->
-    test 'should set new bounds properly', ->
-      sw = new LatLng 0,0
-      ne = new LatLng 20,20
-      bounds = new globeGeometry.LatLngBounds sw, ne
-      zoomedBounds = Mercator.zoomOutBounds bounds, 2
+  # suite 'fromTileToLatLngBounds', ->
+  #   test 'should work for 50,1 in zoom 13', ->
+  #     latLng = new LatLng 50, 1
+  #     tile = Mercator.fromLatLngToTile latLng, 13
+  #     bounds = Mercator.fromTileToLatLngBounds tile
+  #     assert.instanceOf bounds, globeGeometry.LatLngBounds
+  #     assert.equal bounds.getSouthWest().getLat(), 49.97959814983682
+  #     assert.equal bounds.getSouthWest().getLng(), 0.966796875
+  #     assert.equal bounds.getNorthEast().getLat(), 50.00773901463686
+  #     assert.equal bounds.getNorthEast().getLng(), 1.0105705261230469
 
-      assert.equal Math.round(zoomedBounds.getSouthWest().getLat()), -10
-      assert.equal Math.round(zoomedBounds.getSouthWest().getLng()), -10
-      assert.equal Math.round(zoomedBounds.getNorthEast().getLat()), 29
-      assert.equal Math.round(zoomedBounds.getNorthEast().getLng()), 30
+  # suite 'zoomOutBounds', ->
+  #   test 'should set new bounds properly', ->
+  #     sw = new LatLng 0,0
+  #     ne = new LatLng 20,20
+  #     bounds = new globeGeometry.LatLngBounds sw, ne
+  #     zoomedBounds = Mercator.zoomOutBounds bounds, 2
+
+  #     assert.equal Math.round(zoomedBounds.getSouthWest().getLat()), -10
+  #     assert.equal Math.round(zoomedBounds.getSouthWest().getLng()), -10
+  #     assert.equal Math.round(zoomedBounds.getNorthEast().getLat()), 29
+  #     assert.equal Math.round(zoomedBounds.getNorthEast().getLng()), 30
