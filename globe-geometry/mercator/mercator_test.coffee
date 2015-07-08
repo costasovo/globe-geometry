@@ -18,23 +18,6 @@ suite 'globeGeometry.mercator', ->
       assert.equal tile.getX(), 4
       assert.equal tile.getY(), 4
       assert.equal tile.getZ(), 3
-    test 'should work properly with negative values', ->
-        latLng = new LatLng -40.90071485801472, -60.629589843750004
-        tile = Mercator.fromLatLngToTile latLng, 4
-
-        assert.instanceOf tile, globeGeometry.MercatorTile
-        assert.equal tile.getX(), 5
-        assert.equal tile.getY(), 10
-        assert.equal tile.getZ(), 4
-
-        latLng = new LatLng -42.16795603801831, -60.453808593750004
-        tile = Mercator.fromLatLngToTile latLng, 4
-
-        assert.instanceOf tile, globeGeometry.MercatorTile
-        assert.equal tile.getX(), 5
-        assert.equal tile.getY(), 10
-        assert.equal tile.getZ(), 4
-
 
   suite 'fromLatLngToPoint', ->
     test 'should work for 0,0', ->

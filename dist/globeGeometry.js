@@ -2875,10 +2875,8 @@ globeGeometry.mercator.fromLatLngToPoint = function(latLng, zoomLevel) {
 globeGeometry.mercator.fromLatLngToTile = function(latLng, zoomLevel) {
   var point, x, y;
   point = globeGeometry.mercator.fromLatLngToPoint(latLng, zoomLevel);
-  x = point.getX() / globeGeometry.mercator.TILE_SIZE;
-  x = Math.floor(x);
-  y = point.getY() / globeGeometry.mercator.TILE_SIZE;
-  y = latLng.getLat() < 0 ? Math.round(y) : Math.floor(y);
+  x = Math.floor(point.getX() / globeGeometry.mercator.TILE_SIZE);
+  y = Math.floor(point.getY() / globeGeometry.mercator.TILE_SIZE);
   return new globeGeometry.MercatorTile(x, y, zoomLevel);
 };
 globeGeometry.mercator.fromPointToLatLng = function(point, zoomLevel) {
